@@ -24,4 +24,10 @@
             </values>
         </enum>
     </attributes>
+    <conditions>
+    	<condition name="canChange" usage="view">
+    		<description>Allows InvoiceItem rows within a Data Grid to be modified</description>
+    		<expression>((InvoiceItemExtension)this).canChange()</expression>
+    	</condition>
+    </conditions>
 </document>

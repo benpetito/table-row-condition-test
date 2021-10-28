@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import modules.tableRowConditionTest.InvoiceItem.InvoiceItemExtension;
 import org.skyve.CORE;
 import org.skyve.domain.Bean;
 import org.skyve.domain.ChildBean;
@@ -26,7 +27,7 @@ import org.skyve.metadata.model.document.Bizlet.DomainValue;
  */
 @XmlType
 @XmlRootElement
-public class InvoiceItem extends AbstractPersistentBean implements ChildBean<Invoice> {
+public abstract class InvoiceItem extends AbstractPersistentBean implements ChildBean<Invoice> {
 	/**
 	 * For Serialization
 	 * @hidden
@@ -164,7 +165,7 @@ public class InvoiceItem extends AbstractPersistentBean implements ChildBean<Inv
 		return InvoiceItem.DOCUMENT_NAME;
 	}
 
-	public static InvoiceItem newInstance() {
+	public static InvoiceItemExtension newInstance() {
 		try {
 			return CORE.getUser().getCustomer().getModule(MODULE_NAME).getDocument(CORE.getUser().getCustomer(), DOCUMENT_NAME).newInstance(CORE.getUser());
 		}
@@ -264,6 +265,25 @@ public class InvoiceItem extends AbstractPersistentBean implements ChildBean<Inv
 	public void setType(Type type) {
 		preset(typePropertyName, type);
 		this.type = type;
+	}
+
+	/**
+	 * Allows InvoiceItem rows within a Data Grid to be modified
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isCanChange() {
+		return (((InvoiceItemExtension)this).canChange());
+	}
+
+	/**
+	 * {@link #isCanChange} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotCanChange() {
+		return (! isCanChange());
 	}
 
 	@Override

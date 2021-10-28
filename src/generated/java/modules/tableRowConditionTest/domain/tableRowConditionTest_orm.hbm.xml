@@ -32,7 +32,7 @@
 		<filter name="tableRowConditionTestInvoiceUserIdFilter" condition="bizUserId=:userIdParam"/>
 	</class>
 
-	<class name="modules.tableRowConditionTest.domain.InvoiceItem" table="TAB_InvoiceItem" entity-name="tableRowConditionTestInvoiceItem">
+	<class name="modules.tableRowConditionTest.InvoiceItem.InvoiceItemExtension" table="TAB_InvoiceItem" entity-name="tableRowConditionTestInvoiceItem">
 		<id name="bizId" length="36" />
 		<version name="bizVersion" unsaved-value="null" />
 		<property name="bizLock" type="OptimisticLock" length="271" not-null="true" />

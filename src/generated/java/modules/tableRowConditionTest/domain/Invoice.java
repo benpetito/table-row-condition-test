@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import modules.tableRowConditionTest.InvoiceItem.InvoiceItemExtension;
 import org.skyve.CORE;
 import org.skyve.domain.messages.DomainException;
 import org.skyve.impl.domain.AbstractPersistentBean;
@@ -53,7 +54,7 @@ public class Invoice extends AbstractPersistentBean {
 	/**
 	 * Items
 	 **/
-	private List<InvoiceItem> items = new ChangeTrackingArrayList<>("items", this);
+	private List<InvoiceItemExtension> items = new ChangeTrackingArrayList<>("items", this);
 
 	@Override
 	@XmlTransient
@@ -137,7 +138,7 @@ public class Invoice extends AbstractPersistentBean {
 	 * @return	The value.
 	 **/
 	@XmlElement
-	public List<InvoiceItem> getItems() {
+	public List<InvoiceItemExtension> getItems() {
 		return items;
 	}
 
@@ -146,7 +147,7 @@ public class Invoice extends AbstractPersistentBean {
 	 * @param bizId	The bizId of the element in the list.
 	 * @return	The value of the element in the list.
 	 **/
-	public InvoiceItem getItemsElementById(String bizId) {
+	public InvoiceItemExtension getItemsElementById(String bizId) {
 		return getElementById(items, bizId);
 	}
 
@@ -155,7 +156,7 @@ public class Invoice extends AbstractPersistentBean {
 	 * @param bizId	The bizId of the element in the list.
 	 * @param element	The new value of the element in the list.
 	 **/
-	public void setItemsElementById(String bizId, InvoiceItem element) {
+	public void setItemsElementById(String bizId, InvoiceItemExtension element) {
 		setElementById(items, element);
 	}
 
@@ -163,7 +164,7 @@ public class Invoice extends AbstractPersistentBean {
 	 * {@link #items} add.
 	 * @param element	The element to add.
 	 **/
-	public boolean addItemsElement(InvoiceItem element) {
+	public boolean addItemsElement(InvoiceItemExtension element) {
 		boolean result = items.add(element);
 		element.setParent(this);
 		return result;
@@ -174,7 +175,7 @@ public class Invoice extends AbstractPersistentBean {
 	 * @param index	The index in the list to add the element to.
 	 * @param element	The element to add.
 	 **/
-	public void addItemsElement(int index, InvoiceItem element) {
+	public void addItemsElement(int index, InvoiceItemExtension element) {
 		items.add(index, element);
 		element.setParent(this);
 	}
@@ -183,7 +184,7 @@ public class Invoice extends AbstractPersistentBean {
 	 * {@link #items} remove.
 	 * @param element	The element to remove.
 	 **/
-	public boolean removeItemsElement(InvoiceItem element) {
+	public boolean removeItemsElement(InvoiceItemExtension element) {
 		boolean result = items.remove(element);
 		element.setParent(null);
 		return result;
@@ -193,8 +194,8 @@ public class Invoice extends AbstractPersistentBean {
 	 * {@link #items} remove.
 	 * @param index	The index in the list to remove the element from.
 	 **/
-	public InvoiceItem removeItemsElement(int index) {
-		InvoiceItem result = items.remove(index);
+	public InvoiceItemExtension removeItemsElement(int index) {
+		InvoiceItemExtension result = items.remove(index);
 		result.setParent(null);
 		return result;
 	}
