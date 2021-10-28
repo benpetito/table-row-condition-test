@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://www.skyve.org/xml/document" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="InvoiceItem" xsi:schemaLocation="http://www.skyve.org/xml/document ../../../schemas/document.xsd">
+    <persistent name="TAB_InvoiceItem"/>
+    <singularAlias>Invoice Item</singularAlias>
+    <pluralAlias>Invoice Items</pluralAlias>
+    <parentDocument>Invoice</parentDocument>
+    <bizKey expression="Invoice Item - {item}"/>
+    <attributes>
+        <text required="true" name="item">
+            <displayName>Item</displayName>
+            <length>200</length>
+        </text>
+        <decimal2 required="true" name="amount">
+            <displayName>Amount</displayName>
+        </decimal2>
+        <integer name="quantity">
+            <displayName>Quantity</displayName>
+        </integer>
+        <enum name="type">
+            <displayName>Type</displayName>
+            <values>
+                <value code="Items"/>
+                <value code="Hours"/>
+            </values>
+        </enum>
+    </attributes>
+</document>

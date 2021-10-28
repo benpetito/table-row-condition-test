@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-access="field">
+
+	<typedef name="OptimisticLock" class="org.skyve.impl.domain.types.OptimisticLockUserType" />
+	<typedef name="Decimal2" class="org.skyve.impl.domain.types.Decimal2UserType" />
+	<typedef name="Decimal5" class="org.skyve.impl.domain.types.Decimal5UserType" />
+	<typedef name="Decimal10" class="org.skyve.impl.domain.types.Decimal10UserType" />
+	<typedef name="DateOnly" class="org.skyve.impl.domain.types.DateOnlyUserType" />
+	<typedef name="DateTime" class="org.skyve.impl.domain.types.DateTimeUserType" />
+	<typedef name="TimeOnly" class="org.skyve.impl.domain.types.TimeOnlyUserType" />
+	<typedef name="Timestamp" class="org.skyve.impl.domain.types.TimestampUserType" />
+	<typedef name="Enum" class="org.skyve.impl.domain.types.EnumUserType" />
+	<class name="modules.tableRowConditionTest.domain.Invoice" table="TAB_Invoice" entity-name="tableRowConditionTestInvoice">
+		<id name="bizId" length="36" />
+		<version name="bizVersion" unsaved-value="null" />
+		<property name="bizLock" type="OptimisticLock" length="271" not-null="true" />
+		<property name="bizKey" length="1024" not-null="true" />
+		<property name="bizCustomer" length="50" not-null="true" />
+		<property name="bizFlagComment" length="1024" />
+		<property name="bizDataGroupId" length="36" />
+		<property name="bizUserId" length="36" not-null="true" />
+		<property name="invoiceNo" />
+		<property name="description" length="200" />
+		<bag name="items" cascade="all-delete-orphan">
+			<key column="parent_id" />
+			<one-to-many entity-name="tableRowConditionTestInvoiceItem" />
+		</bag>
+		<filter name="tableRowConditionTestInvoiceNoneFilter" condition="1=0"/>
+		<filter name="tableRowConditionTestInvoiceCustomerFilter" condition="bizCustomer=:customerParam"/>
+		<filter name="tableRowConditionTestInvoiceDataGroupIdFilter" condition="bizDataGroupId=:dataGroupIdParam"/>
+		<filter name="tableRowConditionTestInvoiceUserIdFilter" condition="bizUserId=:userIdParam"/>
+	</class>
+
+	<class name="modules.tableRowConditionTest.domain.InvoiceItem" table="TAB_InvoiceItem" entity-name="tableRowConditionTestInvoiceItem">
+		<id name="bizId" length="36" />
+		<version name="bizVersion" unsaved-value="null" />
+		<property name="bizLock" type="OptimisticLock" length="271" not-null="true" />
+		<property name="bizKey" length="1024" not-null="true" />
+		<property name="bizCustomer" length="50" not-null="true" />
+		<property name="bizFlagComment" length="1024" />
+		<property name="bizDataGroupId" length="36" />
+		<property name="bizUserId" length="36" not-null="true" />
+		<many-to-one name="parent" entity-name="tableRowConditionTestInvoice" column="parent_id" insert="false" update="false" foreign-key="FK_TAB_InvoiceItem_parent" />
+		<property name="item" length="200" />
+		<property name="amount" type="Decimal2" precision="20" scale="2" />
+		<property name="quantity" />
+		<property name="type" length="5">
+			<type name="Enum">
+				<param name="enumClass">modules.tableRowConditionTest.domain.InvoiceItem$Type</param>
+			</type>
+		</property>
+		<filter name="tableRowConditionTestInvoiceItemNoneFilter" condition="1=0"/>
+		<filter name="tableRowConditionTestInvoiceItemCustomerFilter" condition="bizCustomer=:customerParam"/>
+		<filter name="tableRowConditionTestInvoiceItemDataGroupIdFilter" condition="bizDataGroupId=:dataGroupIdParam"/>
+		<filter name="tableRowConditionTestInvoiceItemUserIdFilter" condition="bizUserId=:userIdParam"/>
+	</class>
+
+	<filter-def name="tableRowConditionTestInvoiceNoneFilter" />
+	<filter-def name="tableRowConditionTestInvoiceCustomerFilter">
+		<filter-param name="customerParam" type="string"/>
+	</filter-def>
+	<filter-def name="tableRowConditionTestInvoiceDataGroupIdFilter">
+		<filter-param name="dataGroupIdParam" type="string"/>
+	</filter-def>
+	<filter-def name="tableRowConditionTestInvoiceUserIdFilter">
+		<filter-param name="userIdParam" type="string"/>
+	</filter-def>
+	<filter-def name="tableRowConditionTestInvoiceItemNoneFilter" />
+	<filter-def name="tableRowConditionTestInvoiceItemCustomerFilter">
+		<filter-param name="customerParam" type="string"/>
+	</filter-def>
+	<filter-def name="tableRowConditionTestInvoiceItemDataGroupIdFilter">
+		<filter-param name="dataGroupIdParam" type="string"/>
+	</filter-def>
+	<filter-def name="tableRowConditionTestInvoiceItemUserIdFilter">
+		<filter-param name="userIdParam" type="string"/>
+	</filter-def>
+</hibernate-mapping>

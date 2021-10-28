@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://www.skyve.org/xml/document" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Invoice" xsi:schemaLocation="http://www.skyve.org/xml/document ../../../schemas/document.xsd">
+    <persistent name="TAB_Invoice"/>
+    <singularAlias>Invoice</singularAlias>
+    <pluralAlias>Invoices</pluralAlias>
+    <bizKey expression="Invoice - {invoiceNo}"/>
+    <attributes>
+        <integer required="true" name="invoiceNo">
+            <displayName>Invoice No.</displayName>
+        </integer>
+        <text required="true" name="description">
+            <displayName>Description</displayName>
+            <length>200</length>
+        </text>
+        <collection type="child" name="items">
+            <displayName>Items</displayName>
+            <documentName>InvoiceItem</documentName>
+            <minCardinality>0</minCardinality>
+            <ordering/>
+        </collection>
+    </attributes>
+</document>

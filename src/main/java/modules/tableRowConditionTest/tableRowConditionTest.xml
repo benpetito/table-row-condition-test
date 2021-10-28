@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="http://www.skyve.org/xml/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" title="Table Row Condition Test" prototype="true" name="tableRowConditionTest" xsi:schemaLocation="http://www.skyve.org/xml/module ../../schemas/module.xsd">
+    <homeRef>list</homeRef>
+    <homeDocument>Invoice</homeDocument>
+    <documents>
+        <document ref="Invoice"/>
+        <document ref="InvoiceItem"/>
+    </documents>
+    <roles>
+        <role name="Viewer">
+            <description><![CDATA[Enough privileges to view Table Row Condition Test documents.]]></description>
+            <privileges>
+                <document name="Invoice" permission="_R__C"/>
+                <document name="InvoiceItem" permission="_R__C"/>
+            </privileges>
+        </role>
+        <role name="Maintainer">
+            <description><![CDATA[Enough privileges to create and edit Table Row Condition Test documents.]]></description>
+            <privileges>
+                <document name="Invoice" permission="CRUDC"/>
+                <document name="InvoiceItem" permission="CRUDC"/>
+            </privileges>
+        </role>
+    </roles>
+    <menu>
+        <list document="Invoice" name="Invoices">
+            <role name="Maintainer"/>
+            <role name="Viewer"/>
+        </list>
+    </menu>
+</module>
