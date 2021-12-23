@@ -14,7 +14,7 @@ import org.skyve.impl.metadata.view.widget.bound.input.Combo;
 import org.skyve.impl.metadata.view.widget.bound.input.TextField;
 import org.skyve.impl.metadata.view.widget.bound.tabular.AbstractDataWidget;
 import org.skyve.impl.metadata.view.widget.bound.tabular.DataGridBoundColumn;
-import org.skyve.impl.web.faces.pipeline.component.TabularComponentBuilder;
+import org.skyve.impl.web.faces.pipeline.component.ResponsiveComponentBuilder;
 
 /**
  * Custom component builder to allow data grid to specify individual rows to be enabled
@@ -22,7 +22,7 @@ import org.skyve.impl.web.faces.pipeline.component.TabularComponentBuilder;
  * 
  * @author benpetito
  */
-public class DataGridComponentBuilder extends TabularComponentBuilder {
+public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 	// names of the properties to refer to within the data grid
 	public static final String EDITABLE_CONDITION_KEY = "editableCondition";
 	public static final String VISIBLE_CONDITION_KEY = "visibleCondition";
