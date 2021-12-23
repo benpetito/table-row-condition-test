@@ -45,6 +45,7 @@
 		<property name="item" length="200" />
 		<property name="amount" type="Decimal2" precision="20" scale="2" />
 		<property name="quantity" />
+		<property name="delivery" />
 		<property name="type" length="5">
 			<type name="Enum">
 				<param name="enumClass">modules.tableRowConditionTest.domain.InvoiceItem$Type</param>

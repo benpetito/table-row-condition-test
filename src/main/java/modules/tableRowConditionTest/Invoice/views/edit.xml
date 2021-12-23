@@ -33,6 +33,11 @@
 					<c:property key="editableCondition">canChange</c:property>
 				</properties>
 	        </boundColumn>
+	        <boundColumn binding="delivery">
+	        	<properties>
+	        		<c:property key="rerender">change</c:property>
+	        	</properties>
+	        </boundColumn>
 	    </dataGrid>
     </vbox>
     <actions>

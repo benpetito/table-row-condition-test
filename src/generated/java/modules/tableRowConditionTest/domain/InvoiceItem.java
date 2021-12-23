@@ -50,6 +50,9 @@ public abstract class InvoiceItem extends AbstractPersistentBean implements Chil
 	public static final String quantityPropertyName = "quantity";
 
 	/** @hidden */
+	public static final String deliveryPropertyName = "delivery";
+
+	/** @hidden */
 	public static final String typePropertyName = "type";
 
 	/**
@@ -143,6 +146,11 @@ public abstract class InvoiceItem extends AbstractPersistentBean implements Chil
 	 * Quantity
 	 **/
 	private Integer quantity;
+
+	/**
+	 * Delivery
+	 **/
+	private Boolean delivery = Boolean.valueOf(false);
 
 	/**
 	 * Type
@@ -247,6 +255,24 @@ public abstract class InvoiceItem extends AbstractPersistentBean implements Chil
 	public void setQuantity(Integer quantity) {
 		preset(quantityPropertyName, quantity);
 		this.quantity = quantity;
+	}
+
+	/**
+	 * {@link #delivery} accessor.
+	 * @return	The value.
+	 **/
+	public Boolean getDelivery() {
+		return delivery;
+	}
+
+	/**
+	 * {@link #delivery} mutator.
+	 * @param delivery	The new value.
+	 **/
+	@XmlElement
+	public void setDelivery(Boolean delivery) {
+		preset(deliveryPropertyName, delivery);
+		this.delivery = delivery;
 	}
 
 	/**

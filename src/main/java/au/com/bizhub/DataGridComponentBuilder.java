@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.skyve.domain.types.converters.Converter;
 import org.skyve.domain.types.converters.Format;
 import org.skyve.impl.metadata.view.event.RerenderEventAction;
+import org.skyve.impl.metadata.view.widget.bound.input.CheckBox;
 import org.skyve.impl.metadata.view.widget.bound.input.Combo;
 import org.skyve.impl.metadata.view.widget.bound.input.TextField;
 import org.skyve.impl.metadata.view.widget.bound.tabular.AbstractDataWidget;
@@ -59,6 +60,21 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 		}
 
 		return col;
+	}
+
+	@Override
+	public EventSourceComponent checkBox(EventSourceComponent component, String dataWidgetVar, CheckBox checkBox,
+			String formDisabledConditionName, String title, boolean required) {
+		final EventSourceComponent eventSource = super.checkBox(component, dataWidgetVar, checkBox, formDisabledConditionName,
+				title, required);
+		final UIComponent checkBoxField = eventSource.getComponent();
+
+		if (StringUtils.isNotBlank(rerenderEventName)) {
+			addBoundColumnRerenderEvent((UIComponentBase) checkBoxField, null, dataWidgetVar, checkBox.getBinding());
+			rerenderEventName = null;
+		}
+
+		return eventSource;
 	}
 
 	@Override

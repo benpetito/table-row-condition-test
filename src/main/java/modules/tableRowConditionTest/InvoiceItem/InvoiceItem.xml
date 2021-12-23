@@ -16,6 +16,10 @@
         <integer name="quantity">
             <displayName>Quantity</displayName>
         </integer>
+        <boolean name="delivery">
+        	<displayName>Delivery</displayName>
+        	<defaultValue>false</defaultValue>
+        </boolean>
         <enum name="type">
             <displayName>Type</displayName>
             <values>
