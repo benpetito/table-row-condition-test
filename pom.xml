@@ -14,7 +14,7 @@
 	<properties>
 		<finalName>${project.artifactId}</finalName>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<skyve.version>7.1.4</skyve.version>
+		<skyve.version>8.2.3</skyve.version>
 		<build.number>${project.version}</build.number>
 		<forkCount>2</forkCount>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
@@ -67,7 +67,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.3.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>

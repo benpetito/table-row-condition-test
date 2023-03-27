@@ -12,18 +12,16 @@ import org.skyve.job.Job;
 import org.skyve.persistence.DocumentQuery;
 import org.skyve.persistence.DocumentQuery.AggregateFunction;
 import org.skyve.persistence.Persistence;
+import org.skyve.util.CommunicationUtil;
+import org.skyve.util.CommunicationUtil.ResponseMode;
 import org.skyve.util.PushMessage;
 
-import modules.admin.Communication.CommunicationUtil;
-import modules.admin.Communication.CommunicationUtil.ResponseMode;
 import modules.admin.domain.DataMaintenance;
 import modules.admin.domain.DataMaintenance.EvictOption;
 import modules.admin.domain.DataMaintenance.RefreshOption;
 import modules.admin.domain.ModuleDocument;
 
 public class RefreshDocumentTuplesJob extends Job {
-	private static final long serialVersionUID = 6282346785863992703L;
-
 	@Override
 	public String cancel() {
 		return null;
@@ -53,6 +51,7 @@ public class RefreshDocumentTuplesJob extends Job {
 
 		RefreshOption refresh = dm.getRefreshOption();
 		EvictOption evict = dm.getEvictOption();
+		Boolean flagFailedData = dm.getFlagFailed();
 
 		// iterate
 		for (ModuleDocument doc : dm.getRefreshDocuments()) {
@@ -86,11 +85,15 @@ public class RefreshDocumentTuplesJob extends Job {
 						}
 						pers.begin();
 					}
-					catch (Exception e) {
+					catch (@SuppressWarnings("unused") Exception e) {
 						log.add(String.format("%s - %s failed for id: %s",
 												sb.toString(),
-												dm.getRefreshOption().toDescription(),
+												dm.getRefreshOption().toLocalisedDescription(),
 												bean.getBizId()));
+						if (Boolean.TRUE.equals(flagFailedData)) {
+							bean.setBizFlagComment("Data refresh failed - Please validate data and try again.");
+							CORE.getPersistence().upsertBeanTuple(bean);
+						}
 					}
 					processed++;
 					setPercentComplete((int) (((float) processed) / ((float) size) * 100F));

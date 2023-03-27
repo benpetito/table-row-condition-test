@@ -17,8 +17,6 @@ import org.skyve.web.WebContext;
 import modules.admin.domain.JobSchedule;
 
 public class RunJobNow implements ServerSideAction<JobSchedule> {
-	private static final long serialVersionUID = -1037253249182913062L;
-
 	@Override
 	public ServerSideActionResult<JobSchedule> execute(JobSchedule bean, WebContext webContext) throws Exception {
 
@@ -49,7 +47,7 @@ public class RunJobNow implements ServerSideAction<JobSchedule> {
 		JobMetaData job = module.getJob(parts[1]);
 
 		// run as the current user
-		EXT.runOneShotJob(job, bean, user);
+		EXT.getJobScheduler().runOneShotJob(job, bean, user);
 
 		// Used to update the UI.
 		bean.setJobScheduledImmediately(Boolean.TRUE);

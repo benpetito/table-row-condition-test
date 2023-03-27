@@ -1,7 +1,9 @@
 <%@ page session="false" language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.security.Principal"%>
+<%@ page import="java.util.Enumeration"%>
 <%@ page import="javax.servlet.http.Cookie"%>
 <%@ page import="org.skyve.CORE"%>
+<%@ page import="org.skyve.metadata.customer.Customer"%>
 <%@ page import="org.skyve.metadata.user.User"%>
 <%@ page import="org.skyve.metadata.repository.Repository"%>
 <%@ page import="org.skyve.metadata.router.UxUi"%>
@@ -17,18 +19,20 @@
 <%@ page import="org.skyve.impl.web.UserAgent"%>
 <%@ page import="org.skyve.web.UserAgentType"%>
 <%@ page import="org.skyve.impl.web.WebUtil"%>
-<%@ page import="org.skyve.impl.web.faces.FacesUtil"%>
 <%@ page import="org.skyve.impl.util.SQLMetaDataUtil"%>
 <%@ page import="org.skyve.impl.util.UtilImpl"%>
 
 <%
-	// Stop cookie/request header injection by checking the customer name
+	// Stop cookie/request header injection by checking the valid customer name
 	Repository repository = CORE.getRepository();
 	String customerName = request.getParameter(AbstractWebContext.CUSTOMER_COOKIE_NAME);
 	if (customerName != null) {
-		// This will throw if the customerName value ain't a customer name
+		// This will throw or return null if the customerName value ain't a customer name
 		try {
-			repository.getCustomer(customerName);
+			Customer customer = repository.getCustomer(customerName);
+			if (customer == null) {
+				customerName = null;
+			}
 		}
 		catch (Exception e) {
 			customerName = null;
@@ -56,9 +60,9 @@
 	String c = request.getParameter("c"); // customer
 	String b = request.getParameter("b"); // binding
 
-	// Set the user agent type
+	// Get (and set) the user agent type (if required - could have been set by device.jsp)
 	UserAgentType userAgentType = UserAgent.getType(request);
-	request.setAttribute(FacesUtil.USER_AGENT_TYPE_KEY, userAgentType);
+
 	Router router = repository.getRouter();
 
 	RouteCriteria criteria = new RouteCriteria();
@@ -84,14 +88,22 @@
 		catch (Exception e) {
 			throw new IllegalStateException("Malformed URL cannot be canonicalised", e);
 		}
-		if (router.isUnsecured(criteria)) {
+		
+		// Determine the UX/UI without a user principal
+		UxUi uxui = UserAgent.getUxUi(request);
+		// Now determine if the outcome URL is unsecured or not.
+		String outcomeUrl = router.selectOutcomeUrl(uxui.getName(), criteria);
+		if (router.isUnsecured(outcomeUrl)) {
 			if (customerName == null) {
 				throw new IllegalStateException("Malformed URL - this URL must have a 'c' parameter");
 			}
 			else {
-				// This will throw if the customerName value ain't a customer name
+				// This will throw or return null if the customerName value ain't a valid customer name
 				try {
-					repository.getCustomer(customerName);
+					Customer customer = repository.getCustomer(customerName);
+					if (customer == null) {
+						throw new IllegalStateException("Malformed URL - this URL must have a 'c' parameter with a valid customer");
+					}
 				}
 				catch (Exception e) {
 					throw new IllegalStateException("Malformed URL - this URL must have a 'c' parameter with a valid customer", e);
@@ -110,14 +122,21 @@
 				response.sendRedirect(response.encodeRedirectURL(Util.getLoginUrl()));
 			}
 			else {
-				response.sendRedirect(response.encodeRedirectURL(Util.getHomeUrl() + "loggedIn.jsp?" + queryString));
+				// Remove the customer parameter before redirecting as its now a cookie
+				StringBuilder sb = new StringBuilder(64);
+				Enumeration<String> en = request.getParameterNames();
+				while (en.hasMoreElements()) {
+					String name = en.nextElement();
+					if (! AbstractWebContext.CUSTOMER_COOKIE_NAME.equals(name)) {
+						sb.append((sb.length() == 0) ? '?' : '&');
+						sb.append(name).append('=');
+						sb.append(request.getParameter(name));
+					}
+				}
+				response.sendRedirect(response.encodeRedirectURL(Util.getHomeUrl() + "loggedIn.jsp" + sb.toString()));
 			}
 			return;
 		}
-	}
-	else if (customerName != null) {
-		response.sendRedirect(response.encodeRedirectURL(Util.getHomeUrl()));
-		return;
 	}
 	else {
 		userName = userPrincipal.getName();
@@ -145,11 +164,7 @@
 			return;
 		}
 		
-		// Determine the UX/UI
-		UxUi uxui = ((UxUiSelector) router.getUxuiSelector()).select(userAgentType, request);
-		request.setAttribute(AbstractWebContext.UXUI, uxui);
-
-		// Set the extra criterium if  user is defined
+		// Set the extra criterium if user is defined
 		if (user != null) {
 			criteria.setCustomerName(user.getCustomerName());
 			criteria.setDataGroupId(user.getDataGroupId());
@@ -165,6 +180,8 @@
 			}
 		}
 		
+		// Determine the UX/UI with the user principal
+		UxUi uxui = UserAgent.getUxUi(request);
 		// Determine the route
 		String outcomeUrl = router.selectOutcomeUrl(uxui.getName(), criteria);
 		if (UtilImpl.COMMAND_TRACE) {

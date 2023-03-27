@@ -12,6 +12,7 @@ import org.skyve.domain.messages.DomainException;
 import org.skyve.domain.types.Enumeration;
 import org.skyve.impl.domain.AbstractPersistentBean;
 import org.skyve.metadata.model.document.Bizlet.DomainValue;
+import org.skyve.util.Util;
 
 /**
  * Contact
@@ -21,7 +22,7 @@ import org.skyve.metadata.model.document.Bizlet.DomainValue;
  */
 @XmlType
 @XmlRootElement
-public class Contact extends AbstractPersistentBean {
+public class Contact extends AbstractPersistentBean implements org.skyve.domain.app.admin.Contact {
 	/**
 	 * For Serialization
 	 * @hidden
@@ -80,8 +81,8 @@ public class Contact extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -102,11 +103,11 @@ public class Contact extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static ContactType fromDescription(String description) {
+		public static ContactType fromLocalisedDescription(String description) {
 			ContactType result = null;
 
 			for (ContactType value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}

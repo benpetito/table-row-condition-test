@@ -25,7 +25,6 @@ import modules.admin.domain.ImportExportColumn;
 
 public class ImportExportColumnBizlet extends Bizlet<ImportExportColumn> {
 
-	private static final long serialVersionUID = 3350398188234057554L;
 	public static final String EXPRESSION = "expression...";
 
 	private List<DomainValue> bindings = null;
@@ -46,7 +45,7 @@ public class ImportExportColumnBizlet extends Bizlet<ImportExportColumn> {
 				Module module = customer.getModule(bean.getParent().getModuleName());
 				Document document = module.getDocument(customer, bean.getParent().getDocumentName());
 
-				for (Attribute a : document.getAllAttributes()) {
+				for (Attribute a : document.getAllAttributes(customer)) {
 
 					// exclude unimplemented types - some of these can be handled later
 					if (!AttributeType.collection.equals(a.getAttributeType())

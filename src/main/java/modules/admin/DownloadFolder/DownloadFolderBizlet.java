@@ -13,7 +13,7 @@ import java.util.TreeSet;
 
 import org.skyve.CORE;
 import org.skyve.domain.Bean;
-import org.skyve.domain.MapBean;
+import org.skyve.domain.DynamicBean;
 import org.skyve.domain.PersistentBean;
 import org.skyve.domain.types.OptimisticLock;
 import org.skyve.impl.backup.ExternalBackup;
@@ -25,8 +25,6 @@ import org.skyve.util.FileUtil;
 import modules.admin.domain.DownloadFolder;
 
 public class DownloadFolderBizlet extends Bizlet<DownloadFolder> {
-	private static final long serialVersionUID = -6554942396689007986L;
-
 	/**
 	 * fetch - generalised fetch for DownloadFolder
 	 * @param dirPath
@@ -101,7 +99,7 @@ public class DownloadFolderBizlet extends Bizlet<DownloadFolder> {
 				properties.put(PersistentBean.FLAG_COMMENT_NAME, null);
 				properties.put(Bean.BIZ_KEY, thing);
 				properties.put(DownloadFolder.namePropertyName, thing);
-				rows.add(new MapBean(DownloadFolder.MODULE_NAME, DownloadFolder.DOCUMENT_NAME, properties));
+				rows.add(new DynamicBean(DownloadFolder.MODULE_NAME, DownloadFolder.DOCUMENT_NAME, properties));
 
 				if (i >= end) {
 					break;
@@ -116,7 +114,7 @@ public class DownloadFolderBizlet extends Bizlet<DownloadFolder> {
 
 		Map<String, Object> properties = new TreeMap<>();
 		properties.put(PersistentBean.FLAG_COMMENT_NAME, null);
-		page.setSummary(new MapBean(DownloadFolder.MODULE_NAME, DownloadFolder.DOCUMENT_NAME, properties));
+		page.setSummary(new DynamicBean(DownloadFolder.MODULE_NAME, DownloadFolder.DOCUMENT_NAME, properties));
 		return page;
 	}
 }

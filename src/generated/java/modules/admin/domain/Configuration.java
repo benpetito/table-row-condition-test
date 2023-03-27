@@ -16,11 +16,13 @@ import org.skyve.domain.messages.DomainException;
 import org.skyve.domain.types.Enumeration;
 import org.skyve.impl.domain.AbstractPersistentBean;
 import org.skyve.metadata.model.document.Bizlet.DomainValue;
+import org.skyve.util.Util;
 
 /**
  * Setup
  * 
  * @depend - - - PasswordComplexityModel
+ * @depend - - - TwoFactorType
  * @navhas n publicUser 0..1 UserProxy
  * @navhas n emailToContact 0..1 Contact
  * @navhas n startup 0..1 Startup
@@ -84,6 +86,18 @@ public abstract class Configuration extends AbstractPersistentBean {
 	public static final String passwordComplexityModelPropertyName = "passwordComplexityModel";
 
 	/** @hidden */
+	public static final String twoFactorTypePropertyName = "twoFactorType";
+
+	/** @hidden */
+	public static final String twofactorPushCodeTimeOutSecondsPropertyName = "twofactorPushCodeTimeOutSeconds";
+
+	/** @hidden */
+	public static final String twoFactorEmailSubjectPropertyName = "twoFactorEmailSubject";
+
+	/** @hidden */
+	public static final String twoFactorEmailBodyPropertyName = "twoFactorEmailBody";
+
+	/** @hidden */
 	public static final String publicUserPropertyName = "publicUser";
 
 	/** @hidden */
@@ -115,6 +129,12 @@ public abstract class Configuration extends AbstractPersistentBean {
 
 	/** @hidden */
 	public static final String startupPropertyName = "startup";
+
+	/** @hidden */
+	public static final String availableDiskSpaceAlarmLevelPercentagePropertyName = "availableDiskSpaceAlarmLevelPercentage";
+
+	/** @hidden */
+	public static final String availableDiskSpaceAlarmLevelMBPropertyName = "availableDiskSpaceAlarmLevelMB";
 
 	/**
 	 * Password Complexity
@@ -152,8 +172,8 @@ public abstract class Configuration extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -174,11 +194,11 @@ public abstract class Configuration extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static PasswordComplexityModel fromDescription(String description) {
+		public static PasswordComplexityModel fromLocalisedDescription(String description) {
 			PasswordComplexityModel result = null;
 
 			for (PasswordComplexityModel value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -201,7 +221,86 @@ public abstract class Configuration extends AbstractPersistentBean {
 	}
 
 	/**
-	 * Minumum Password Length
+	 * Two Factor Type
+	 * <br/>
+	 * The type of two factor authentication to be used for all users.
+	 **/
+	@XmlEnum
+	public static enum TwoFactorType implements Enumeration {
+		off("OFF", "Off"),
+		email("EMAIL", "Email");
+
+		private String code;
+		private String description;
+
+		/** @hidden */
+		private DomainValue domainValue;
+
+		/** @hidden */
+		private static List<DomainValue> domainValues;
+
+		private TwoFactorType(String code, String description) {
+			this.code = code;
+			this.description = description;
+			this.domainValue = new DomainValue(code, description);
+		}
+
+		@Override
+		public String toCode() {
+			return code;
+		}
+
+		@Override
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
+		}
+
+		@Override
+		public DomainValue toDomainValue() {
+			return domainValue;
+		}
+
+		public static TwoFactorType fromCode(String code) {
+			TwoFactorType result = null;
+
+			for (TwoFactorType value : values()) {
+				if (value.code.equals(code)) {
+					result = value;
+					break;
+				}
+			}
+
+			return result;
+		}
+
+		public static TwoFactorType fromLocalisedDescription(String description) {
+			TwoFactorType result = null;
+
+			for (TwoFactorType value : values()) {
+				if (value.toLocalisedDescription().equals(description)) {
+					result = value;
+					break;
+				}
+			}
+
+			return result;
+		}
+
+		public static List<DomainValue> toDomainValues() {
+			if (domainValues == null) {
+				TwoFactorType[] values = values();
+				domainValues = new ArrayList<>(values.length);
+				for (TwoFactorType value : values) {
+					domainValues.add(value.domainValue);
+				}
+			}
+
+			return domainValues;
+		}
+	}
+
+	/**
+	 * Minimum Password Length
 	 * <br/>
 	 * The minimum number of characters for new passwords
 	 **/
@@ -298,6 +397,34 @@ public abstract class Configuration extends AbstractPersistentBean {
 	private PasswordComplexityModel passwordComplexityModel;
 
 	/**
+	 * Two Factor Type
+	 * <br/>
+	 * The type of two factor authentication to be used for all users.
+	 **/
+	private TwoFactorType twoFactorType = TwoFactorType.off;
+
+	/**
+	 * Two Factor Code Timeout (seconds)
+	 * <br/>
+	 * The time out in seconds before a Skyve generated two factor code expires.
+	 **/
+	private Integer twofactorPushCodeTimeOutSeconds = Integer.valueOf(300);
+
+	/**
+	 * Two Factor Email Subject
+	 * <br/>
+	 * The subject of the two factor authentication email to be sent to clients.
+	 **/
+	private String twoFactorEmailSubject;
+
+	/**
+	 * Two Factor Email Body
+	 * <br/>
+	 * The body of the two factor authentication email to be sent to clients. Insert {tfaCode} where the TFA code should go.
+	 **/
+	private String twoFactorEmailBody;
+
+	/**
 	 * Anonymous Public User
 	 * <br/>
 	 * The anonymous public user asserted on all public pages.
@@ -354,7 +481,7 @@ public abstract class Configuration extends AbstractPersistentBean {
 	/**
 	 * Account Lockout Duration
 	 * <br/>
-	 * admin.configuration.passwordAccoutnLockoutDuration.description
+	 * Number of seconds per failed sign in attempt to lock the account for. This only applies if an account lockout is set.
 	 * <br/>
 	 * Read from the application JSON file set at system startup.
 	 **/
@@ -369,6 +496,20 @@ public abstract class Configuration extends AbstractPersistentBean {
 	 * Startup
 	 **/
 	private StartupExtension startup = null;
+
+	/**
+	 * Available disk space alarm level as a percentage of total disk space
+	 * <br/>
+	 * When available disk space falls below either level, when the disk space check job is schedule, a notification will be sent to the support email address, (update the Disk Space Check Notification Communication to specify another receiver). If the job is configured without this value set, it will default to 10%.
+	 **/
+	private Integer availableDiskSpaceAlarmLevelPercentage;
+
+	/**
+	 * Available disk space alarm level in MB
+	 * <br/>
+	 * When available disk space falls below either level, when the disk space check job is schedule, a notification will be sent to the support email address, (update the Disk Space Check Notification Communication to specify another receiver). If the job is configured without this value set, it will default to 10%.
+	 **/
+	private Long availableDiskSpaceAlarmLevelMB;
 
 	@Override
 	@XmlTransient
@@ -651,6 +792,78 @@ public abstract class Configuration extends AbstractPersistentBean {
 	}
 
 	/**
+	 * {@link #twoFactorType} accessor.
+	 * @return	The value.
+	 **/
+	public TwoFactorType getTwoFactorType() {
+		return twoFactorType;
+	}
+
+	/**
+	 * {@link #twoFactorType} mutator.
+	 * @param twoFactorType	The new value.
+	 **/
+	@XmlElement
+	public void setTwoFactorType(TwoFactorType twoFactorType) {
+		preset(twoFactorTypePropertyName, twoFactorType);
+		this.twoFactorType = twoFactorType;
+	}
+
+	/**
+	 * {@link #twofactorPushCodeTimeOutSeconds} accessor.
+	 * @return	The value.
+	 **/
+	public Integer getTwofactorPushCodeTimeOutSeconds() {
+		return twofactorPushCodeTimeOutSeconds;
+	}
+
+	/**
+	 * {@link #twofactorPushCodeTimeOutSeconds} mutator.
+	 * @param twofactorPushCodeTimeOutSeconds	The new value.
+	 **/
+	@XmlElement
+	public void setTwofactorPushCodeTimeOutSeconds(Integer twofactorPushCodeTimeOutSeconds) {
+		preset(twofactorPushCodeTimeOutSecondsPropertyName, twofactorPushCodeTimeOutSeconds);
+		this.twofactorPushCodeTimeOutSeconds = twofactorPushCodeTimeOutSeconds;
+	}
+
+	/**
+	 * {@link #twoFactorEmailSubject} accessor.
+	 * @return	The value.
+	 **/
+	public String getTwoFactorEmailSubject() {
+		return twoFactorEmailSubject;
+	}
+
+	/**
+	 * {@link #twoFactorEmailSubject} mutator.
+	 * @param twoFactorEmailSubject	The new value.
+	 **/
+	@XmlElement
+	public void setTwoFactorEmailSubject(String twoFactorEmailSubject) {
+		preset(twoFactorEmailSubjectPropertyName, twoFactorEmailSubject);
+		this.twoFactorEmailSubject = twoFactorEmailSubject;
+	}
+
+	/**
+	 * {@link #twoFactorEmailBody} accessor.
+	 * @return	The value.
+	 **/
+	public String getTwoFactorEmailBody() {
+		return twoFactorEmailBody;
+	}
+
+	/**
+	 * {@link #twoFactorEmailBody} mutator.
+	 * @param twoFactorEmailBody	The new value.
+	 **/
+	@XmlElement
+	public void setTwoFactorEmailBody(String twoFactorEmailBody) {
+		preset(twoFactorEmailBodyPropertyName, twoFactorEmailBody);
+		this.twoFactorEmailBody = twoFactorEmailBody;
+	}
+
+	/**
 	 * {@link #publicUser} accessor.
 	 * @return	The value.
 	 **/
@@ -851,6 +1064,61 @@ public abstract class Configuration extends AbstractPersistentBean {
 	}
 
 	/**
+	 * {@link #availableDiskSpaceAlarmLevelPercentage} accessor.
+	 * @return	The value.
+	 **/
+	public Integer getAvailableDiskSpaceAlarmLevelPercentage() {
+		return availableDiskSpaceAlarmLevelPercentage;
+	}
+
+	/**
+	 * {@link #availableDiskSpaceAlarmLevelPercentage} mutator.
+	 * @param availableDiskSpaceAlarmLevelPercentage	The new value.
+	 **/
+	@XmlElement
+	public void setAvailableDiskSpaceAlarmLevelPercentage(Integer availableDiskSpaceAlarmLevelPercentage) {
+		preset(availableDiskSpaceAlarmLevelPercentagePropertyName, availableDiskSpaceAlarmLevelPercentage);
+		this.availableDiskSpaceAlarmLevelPercentage = availableDiskSpaceAlarmLevelPercentage;
+	}
+
+	/**
+	 * {@link #availableDiskSpaceAlarmLevelMB} accessor.
+	 * @return	The value.
+	 **/
+	public Long getAvailableDiskSpaceAlarmLevelMB() {
+		return availableDiskSpaceAlarmLevelMB;
+	}
+
+	/**
+	 * {@link #availableDiskSpaceAlarmLevelMB} mutator.
+	 * @param availableDiskSpaceAlarmLevelMB	The new value.
+	 **/
+	@XmlElement
+	public void setAvailableDiskSpaceAlarmLevelMB(Long availableDiskSpaceAlarmLevelMB) {
+		preset(availableDiskSpaceAlarmLevelMBPropertyName, availableDiskSpaceAlarmLevelMB);
+		this.availableDiskSpaceAlarmLevelMB = availableDiskSpaceAlarmLevelMB;
+	}
+
+	/**
+	 * availableDiskSpaceAlarmConfigured
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isAvailableDiskSpaceAlarmConfigured() {
+		return (modules.admin.Configuration.ConfigurationExtension.validAvailableDiskSpaceAlarmSchedule());
+	}
+
+	/**
+	 * {@link #isAvailableDiskSpaceAlarmConfigured} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotAvailableDiskSpaceAlarmConfigured() {
+		return (! isAvailableDiskSpaceAlarmConfigured());
+	}
+
+	/**
 	 * backupsConfigured
 	 *
 	 * @return The condition
@@ -914,8 +1182,9 @@ public abstract class Configuration extends AbstractPersistentBean {
 	 */
 	@XmlTransient
 	public boolean isSelfRegistrationConfiguredEmailOrGroupNotConfigured() {
-		return (startup.getAccountAllowUserSelfRegistration().equals(Boolean.TRUE) &&
-					(!modules.admin.Configuration.ConfigurationExtension.validSMTPHost() || userSelfRegistrationGroup == null));
+		return ((startup != null) && 
+					startup.getAccountAllowUserSelfRegistration().equals(Boolean.TRUE) &&
+					((! modules.admin.Configuration.ConfigurationExtension.validSMTPHost()) || (userSelfRegistrationGroup == null)));
 	}
 
 	/**
@@ -944,5 +1213,43 @@ public abstract class Configuration extends AbstractPersistentBean {
 	 */
 	public boolean isNotSingleTenant() {
 		return (! isSingleTenant());
+	}
+
+	/**
+	 * True when the customer has Two Factor Auth Email enabled
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isTfaEmailEnabled() {
+		return (org.skyve.impl.util.UtilImpl.TWO_FACTOR_AUTH_CUSTOMERS.contains(org.skyve.CORE.getCustomer().getName()));
+	}
+
+	/**
+	 * {@link #isTfaEmailEnabled} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotTfaEmailEnabled() {
+		return (! isTfaEmailEnabled());
+	}
+
+	/**
+	 * True when the user has selected Two Factor Auth Email type
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isTfaEmailSelected() {
+		return (TwoFactorType.email == getTwoFactorType());
+	}
+
+	/**
+	 * {@link #isTfaEmailSelected} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotTfaEmailSelected() {
+		return (! isTfaEmailSelected());
 	}
 }

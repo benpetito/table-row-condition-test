@@ -61,6 +61,8 @@
 
   <xs:element name="dialogButton" type="tns:dialogButton"/>
 
+  <xs:element name="documentAggregate" type="tns:viewDocumentAggregateUserAccessMetaData"/>
+
   <xs:element name="download" type="tns:downloadAction"/>
 
   <xs:element name="dynamicImage" type="tns:dynamicImage"/>
@@ -103,13 +105,13 @@
 
   <xs:element name="listRepeater" type="tns:listRepeater"/>
 
-  <xs:element name="lookup" type="tns:lookup"/>
-
   <xs:element name="lookupDescription" type="tns:lookupDescription"/>
 
   <xs:element name="lookupDescriptionColumn" type="tns:lookupDescriptionColumn"/>
 
   <xs:element name="map" type="tns:map"/>
+
+  <xs:element name="modelAggregate" type="tns:viewModelAggregateUserAccessMetaData"/>
 
   <xs:element name="new" type="tns:newAction"/>
 
@@ -125,9 +127,13 @@
 
   <xs:element name="password" type="tns:password"/>
 
+  <xs:element name="previousComplete" type="tns:viewPreviousCompleteUserAccessMetaData"/>
+
   <xs:element name="print" type="tns:printAction"/>
 
   <xs:element name="progressBar" type="tns:progressBar"/>
+
+  <xs:element name="queryAggregate" type="tns:viewQueryAggregateUserAccessMetaData"/>
 
   <xs:element name="queryListViewReference" type="tns:queryListViewReference"/>
 
@@ -154,6 +160,8 @@
   <xs:element name="setDisabled" type="tns:setDisabledEventAction"/>
 
   <xs:element name="setInvisible" type="tns:setInvisibleEventAction"/>
+
+  <xs:element name="singular" type="tns:viewSingularUserAccessMetaData"/>
 
   <xs:element name="slider" type="tns:slider"/>
 
@@ -190,6 +198,8 @@
   <xs:element name="vbox" type="tns:VBox"/>
 
   <xs:element name="view" type="tns:view"/>
+
+  <xs:element name="zoomIn" type="tns:zoomIn"/>
 
   <xs:element name="zoomOut" type="tns:zoomOutAction"/>
 
@@ -461,7 +471,7 @@
 
   <xs:complexType name="lookupDescription">
     <xs:complexContent>
-      <xs:extension base="tns:lookup">
+      <xs:extension base="tns:inputWidget">
         <xs:sequence>
           <xs:element name="dropDown" form="qualified" minOccurs="0">
             <xs:complexType>
@@ -470,18 +480,6 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-        </xs:sequence>
-        <xs:attribute name="descriptionBinding" type="xs:string" use="required"/>
-        <xs:attribute name="editable" type="xs:boolean"/>
-        <xs:attribute name="pixelWidth" type="xs:int"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="lookup">
-    <xs:complexContent>
-      <xs:extension base="tns:inputWidget">
-        <xs:sequence>
           <xs:element name="onPickedHandlers" form="qualified" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
@@ -534,6 +532,7 @@
           <xs:element name="parameter" type="tns:parameterImpl" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="properties" type="ns1:propertyMapType" form="qualified" minOccurs="0"/>
         </xs:sequence>
+        <xs:attribute name="descriptionBinding" type="xs:string" use="required"/>
         <xs:attribute name="query" type="xs:string"/>
         <xs:attribute name="disableEdit" type="xs:string"/>
         <xs:attribute name="enableEdit" type="xs:string"/>
@@ -543,6 +542,8 @@
         <xs:attribute name="enableClear" type="xs:string"/>
         <xs:attribute name="disablePick" type="xs:string"/>
         <xs:attribute name="enablePick" type="xs:string"/>
+        <xs:attribute name="editable" type="xs:boolean"/>
+        <xs:attribute name="pixelWidth" type="xs:int"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -674,6 +675,7 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
+          <xs:element name="accesses" type="tns:accesses" form="qualified" minOccurs="0"/>
           <xs:element name="properties" type="ns1:propertyMapType" form="qualified" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="name" type="xs:string" use="required"/>
@@ -698,6 +700,7 @@
         <xs:element ref="tns:form"/>
         <xs:element ref="tns:tabPane"/>
         <xs:element ref="tns:button"/>
+        <xs:element ref="tns:zoomIn"/>
         <xs:element ref="tns:chart"/>
         <xs:element ref="tns:map"/>
         <xs:element ref="tns:dynamicImage"/>
@@ -757,6 +760,7 @@
       <xs:extension base="tns:abstractAction">
         <xs:sequence/>
         <xs:attribute name="inActionPanel" type="xs:boolean"/>
+        <xs:attribute name="show" type="tns:actionShow"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -938,6 +942,77 @@
     <xs:attribute name="fromBinding" type="xs:string" use="required"/>
   </xs:complexType>
 
+  <xs:complexType name="accesses">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="tns:singular"/>
+        <xs:element ref="tns:documentAggregate"/>
+        <xs:element ref="tns:queryAggregate"/>
+        <xs:element ref="tns:modelAggregate"/>
+        <xs:element ref="tns:previousComplete"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="generate" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="viewSingularUserAccessMetaData">
+    <xs:complexContent>
+      <xs:extension base="tns:viewDocumentAggregateUserAccessMetaData">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="viewDocumentAggregateUserAccessMetaData">
+    <xs:complexContent>
+      <xs:extension base="tns:viewUserAccessMetaData">
+        <xs:sequence/>
+        <xs:attribute name="document" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="viewUserAccessMetaData" abstract="true">
+    <xs:sequence>
+      <xs:element name="uxui" type="tns:viewUserAccessUxUiMetadata" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="viewUserAccessUxUiMetadata">
+    <xs:complexContent>
+      <xs:extension base="ns1:namedMetaData">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="viewQueryAggregateUserAccessMetaData">
+    <xs:complexContent>
+      <xs:extension base="tns:viewUserAccessMetaData">
+        <xs:sequence/>
+        <xs:attribute name="query" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="viewModelAggregateUserAccessMetaData">
+    <xs:complexContent>
+      <xs:extension base="tns:viewUserAccessMetaData">
+        <xs:sequence/>
+        <xs:attribute name="model" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="viewPreviousCompleteUserAccessMetaData">
+    <xs:complexContent>
+      <xs:extension base="tns:viewUserAccessMetaData">
+        <xs:sequence/>
+        <xs:attribute name="binding" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="staticImage">
     <xs:sequence>
       <xs:element name="properties" type="ns1:propertyMapType" form="qualified" minOccurs="0"/>
@@ -1084,6 +1159,7 @@
         <xs:element ref="tns:contentLink"/>
         <xs:element ref="tns:contentSignature"/>
         <xs:element ref="tns:button"/>
+        <xs:element ref="tns:zoomIn"/>
         <xs:element ref="tns:dialogButton"/>
         <xs:element ref="tns:geometry"/>
         <xs:element ref="tns:geometryMap"/>
@@ -1095,7 +1171,6 @@
         <xs:element ref="tns:colourPicker"/>
         <xs:element ref="tns:combo"/>
         <xs:element ref="tns:radio"/>
-        <xs:element ref="tns:lookup"/>
         <xs:element ref="tns:lookupDescription"/>
         <xs:element ref="tns:password"/>
         <xs:element ref="tns:richText"/>
@@ -1153,6 +1228,30 @@
     <xs:attribute name="pixelHeight" type="xs:int"/>
     <xs:attribute name="minPixelHeight" type="xs:int"/>
     <xs:attribute name="maxPixelHeight" type="xs:int"/>
+    <xs:attribute name="show" type="tns:actionShow"/>
+  </xs:complexType>
+
+  <xs:complexType name="zoomIn">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractBound">
+        <xs:sequence>
+          <xs:element name="properties" type="ns1:propertyMapType" form="qualified" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="displayName" type="xs:string"/>
+        <xs:attribute name="invisible" type="xs:string"/>
+        <xs:attribute name="visible" type="xs:string"/>
+        <xs:attribute name="disabled" type="xs:string"/>
+        <xs:attribute name="enabled" type="xs:string"/>
+        <xs:attribute name="iconStyleClass" type="xs:string"/>
+        <xs:attribute name="maxPixelHeight" type="xs:int"/>
+        <xs:attribute name="minPixelHeight" type="xs:int"/>
+        <xs:attribute name="pixelHeight" type="xs:int"/>
+        <xs:attribute name="pixelWidth" type="xs:int"/>
+        <xs:attribute name="relativeIconFileName" type="xs:string"/>
+        <xs:attribute name="show" type="tns:actionShow"/>
+        <xs:attribute name="toolTip" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="dialogButton">
@@ -1967,14 +2066,6 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="horizontalAlignment">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="left"/>
-      <xs:enumeration value="centre"/>
-      <xs:enumeration value="right"/>
-    </xs:restriction>
-  </xs:simpleType>
-
   <xs:simpleType name="sanitisation">
     <xs:restriction base="xs:string">
       <xs:enumeration value="none"/>
@@ -1982,6 +2073,14 @@
       <xs:enumeration value="basic"/>
       <xs:enumeration value="simple"/>
       <xs:enumeration value="text"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="horizontalAlignment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="left"/>
+      <xs:enumeration value="centre"/>
+      <xs:enumeration value="right"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -2012,6 +2111,14 @@
       <xs:enumeration value="previous"/>
       <xs:enumeration value="suggest"/>
       <xs:enumeration value="constrain"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="actionShow">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="icon"/>
+      <xs:enumeration value="text"/>
+      <xs:enumeration value="both"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -2078,6 +2185,7 @@
 
   <xs:simpleType name="temporalBucketType">
     <xs:restriction base="xs:string">
+      <xs:enumeration value="quarter"/>
       <xs:enumeration value="dayMonthYear"/>
       <xs:enumeration value="day"/>
       <xs:enumeration value="month"/>

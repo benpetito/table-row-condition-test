@@ -33,7 +33,7 @@
 						</item>
 						<item>
 							<blurb textAlignment="left">
-									<![CDATA[admin.importExport.edit.configureOptions.blurb1]]>
+									<![CDATA[<em>{i18n:admin.importExport.edit.configureOptions.blurb1}</em>]]>
 								</blurb>
 						</item>
 					</row>
@@ -56,7 +56,7 @@
 								<onChangedHandlers>
 									<rerender clientValidation="false">
 										<properties>
-											<c:property key="update">configureOptions</c:property>
+											<c:property key="update">configureOptions,columns</c:property>
 										</properties>
 									</rerender>
 								</onChangedHandlers>
@@ -96,7 +96,7 @@
 								<spacer />
 							</item>
 							<item>
-								<blurb><![CDATA[admin.importExport.edit.configureOptions.blurb2]]></blurb>
+								<blurb escape="false"><![CDATA[<strong><em>{importFileName}</em></strong>{i18n:admin.importExport.edit.configureOptions.blurb2}]]></blurb>
 							</item>
 							<item>
 								<button pixelWidth="200" action="ClearImport" />
@@ -158,22 +158,22 @@
 	</vbox>
 	<vbox widgetId="columns">
 		<vbox visible="showUploadColumns" border="true" borderTitle="admin.importExport.edit.configureImportColumns.borderTitle">
-			<dataGrid binding="importExportColumns" invisible="showExpressions" inline="true" showEdit="false">
+			<dataGrid binding="importExportColumns" invisible="showExpressions" inline="true" >
 				<boundColumn binding="columnName" />
 				<boundColumn binding="bindingName" />
 			</dataGrid>
-			<dataGrid binding="importExportColumns" visible="showExpressions" showEdit="false">
+			<dataGrid binding="importExportColumns" visible="showExpressions" >
 				<boundColumn binding="columnName" />
 				<boundColumn binding="bindingName" />
 				<boundColumn binding="bindingExpression" />
 			</dataGrid>
 		</vbox>
 		<vbox visible="showExport" border="true" borderTitle="admin.importExport.edit.configureExportColumns.borderTitle">
-			<dataGrid binding="importExportColumns" invisible="showExpressions" showEdit="false">
+			<dataGrid binding="importExportColumns" invisible="showExpressions" >
 				<boundColumn binding="bindingName" />
 				<boundColumn binding="columnName" />
 			</dataGrid>
-			<dataGrid binding="importExportColumns" visible="showExpressions" showEdit="false">
+			<dataGrid binding="importExportColumns" visible="showExpressions" >
 				<boundColumn binding="bindingName" />
 				<boundColumn binding="bindingExpression" />
 				<boundColumn binding="columnName" />

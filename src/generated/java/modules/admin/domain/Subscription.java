@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import modules.admin.Communication.CommunicationExtension;
-import modules.admin.domain.Communication.FormatType;
 import org.skyve.CORE;
 import org.skyve.domain.messages.DomainException;
 import org.skyve.impl.domain.AbstractPersistentBean;
@@ -25,13 +24,12 @@ import org.skyve.impl.domain.AbstractPersistentBean;
 		Subscriptions are user-scoped - The assumption is that it is up to the user whether they wish to 
 		accept or decline receiving communications and in what manner they are delivered.
  * 
- * @depend - - - FormatType
  * @navhas n communication 1 Communication
  * @stereotype "persistent"
  */
 @XmlType
 @XmlRootElement
-public class Subscription extends AbstractPersistentBean {
+public class Subscription extends AbstractPersistentBean implements org.skyve.domain.app.admin.Subscription {
 	/**
 	 * For Serialization
 	 * @hidden
@@ -54,10 +52,6 @@ public class Subscription extends AbstractPersistentBean {
 	public static final String declinedPropertyName = "declined";
 
 	/** @hidden */
-	@Deprecated
-	public static final String formatTypePropertyName = "formatType";
-
-	/** @hidden */
 	public static final String preferredReceiverIdentifierPropertyName = "preferredReceiverIdentifier";
 
 	/**
@@ -76,14 +70,6 @@ public class Subscription extends AbstractPersistentBean {
 	 * Declined
 	 **/
 	private Boolean declined;
-
-	/**
-	 * Format
-	 * <br/>
-	 * This feature has been deprecated
-	 **/
-	@Deprecated
-	private FormatType formatType;
 
 	/**
 	 * Redirect to
@@ -149,19 +135,8 @@ public class Subscription extends AbstractPersistentBean {
 	public void setCommunication(CommunicationExtension communication) {
 		if (this.communication != communication) {
 			preset(communicationPropertyName, communication);
-			CommunicationExtension oldCommunication = this.communication;
 			this.communication = communication;
-			if ((communication != null) && (communication.getSubscriptionsElementById(getBizId()) == null)) {
-				communication.getSubscriptions().add(this);
-			}
-			if (oldCommunication != null) {
-				oldCommunication.getSubscriptions().remove(this);
-			}
 		}
-	}
-
-	public void nullCommunication() {
-		this.communication = null;
 	}
 
 	/**
@@ -198,26 +173,6 @@ public class Subscription extends AbstractPersistentBean {
 	public void setDeclined(Boolean declined) {
 		preset(declinedPropertyName, declined);
 		this.declined = declined;
-	}
-
-	/**
-	 * {@link #formatType} accessor.
-	 * @return	The value.
-	 **/
-	@Deprecated
-	public FormatType getFormatType() {
-		return formatType;
-	}
-
-	/**
-	 * {@link #formatType} mutator.
-	 * @param formatType	The new value.
-	 **/
-	@Deprecated
-	@XmlElement
-	public void setFormatType(FormatType formatType) {
-		preset(formatTypePropertyName, formatType);
-		this.formatType = formatType;
 	}
 
 	/**

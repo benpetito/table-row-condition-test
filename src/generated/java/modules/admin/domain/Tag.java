@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import modules.admin.Tag.TagExtension;
 import modules.admin.UserProxy.UserProxyExtension;
 import modules.admin.domain.DataMaintenance.EvictOption;
 import org.skyve.CORE;
@@ -14,6 +15,7 @@ import org.skyve.domain.messages.DomainException;
 import org.skyve.domain.types.Enumeration;
 import org.skyve.impl.domain.AbstractPersistentBean;
 import org.skyve.metadata.model.document.Bizlet.DomainValue;
+import org.skyve.util.Util;
 
 /**
  * Tag
@@ -28,7 +30,7 @@ import org.skyve.metadata.model.document.Bizlet.DomainValue;
  */
 @XmlType
 @XmlRootElement
-public class Tag extends AbstractPersistentBean {
+public abstract class Tag extends AbstractPersistentBean implements org.skyve.domain.app.admin.Tag {
 	/**
 	 * For Serialization
 	 * @hidden
@@ -152,8 +154,8 @@ public class Tag extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -174,11 +176,11 @@ public class Tag extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static CombinationsOperator fromDescription(String description) {
+		public static CombinationsOperator fromLocalisedDescription(String description) {
 			CombinationsOperator result = null;
 
 			for (CombinationsOperator value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -230,8 +232,8 @@ public class Tag extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -252,11 +254,11 @@ public class Tag extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static FilterOperator fromDescription(String description) {
+		public static FilterOperator fromLocalisedDescription(String description) {
 			FilterOperator result = null;
 
 			for (FilterOperator value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -307,8 +309,8 @@ public class Tag extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -329,11 +331,11 @@ public class Tag extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static FilterAction fromDescription(String description) {
+		public static FilterAction fromLocalisedDescription(String description) {
 			FilterAction result = null;
 
 			for (FilterAction value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -475,7 +477,7 @@ public class Tag extends AbstractPersistentBean {
 	 * <br/>
 	 * The other tag to use for the combination.
 	 **/
-	private Tag operandTag = null;
+	private TagExtension operandTag = null;
 
 	/**
 	 * Tagged
@@ -521,7 +523,7 @@ public class Tag extends AbstractPersistentBean {
 		return Tag.DOCUMENT_NAME;
 	}
 
-	public static Tag newInstance() {
+	public static TagExtension newInstance() {
 		try {
 			return CORE.getUser().getCustomer().getModule(MODULE_NAME).getDocument(CORE.getUser().getCustomer(), DOCUMENT_NAME).newInstance(CORE.getUser());
 		}
@@ -926,7 +928,7 @@ public class Tag extends AbstractPersistentBean {
 	 * {@link #operandTag} accessor.
 	 * @return	The value.
 	 **/
-	public Tag getOperandTag() {
+	public TagExtension getOperandTag() {
 		return operandTag;
 	}
 
@@ -935,7 +937,7 @@ public class Tag extends AbstractPersistentBean {
 	 * @param operandTag	The new value.
 	 **/
 	@XmlElement
-	public void setOperandTag(Tag operandTag) {
+	public void setOperandTag(TagExtension operandTag) {
 		if (this.operandTag != operandTag) {
 			this.operandTag = operandTag;
 		}

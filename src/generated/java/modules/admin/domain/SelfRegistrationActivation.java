@@ -14,6 +14,7 @@ import org.skyve.domain.messages.DomainException;
 import org.skyve.domain.types.Enumeration;
 import org.skyve.impl.domain.AbstractTransientBean;
 import org.skyve.metadata.model.document.Bizlet.DomainValue;
+import org.skyve.util.Util;
 
 /**
  * Self Registration Activation
@@ -46,6 +47,21 @@ public abstract class SelfRegistrationActivation extends AbstractTransientBean {
 	/** @hidden */
 	public static final String loginUrlPropertyName = "loginUrl";
 
+	/** @hidden */
+	public static final String pleaseSignInPropertyName = "pleaseSignIn";
+
+	/** @hidden */
+	public static final String signInLinkPropertyName = "signInLink";
+
+	/** @hidden */
+	public static final String alreadyActivatedPropertyName = "alreadyActivated";
+
+	/** @hidden */
+	public static final String noLongerValidPropertyName = "noLongerValid";
+
+	/** @hidden */
+	public static final String notRecognisedPropertyName = "notRecognised";
+
 	/**
 	 * Activation Result
 	 **/
@@ -77,8 +93,8 @@ public abstract class SelfRegistrationActivation extends AbstractTransientBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -99,11 +115,11 @@ public abstract class SelfRegistrationActivation extends AbstractTransientBean {
 			return result;
 		}
 
-		public static Result fromDescription(String description) {
+		public static Result fromLocalisedDescription(String description) {
 			Result result = null;
 
 			for (Result value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -141,6 +157,41 @@ public abstract class SelfRegistrationActivation extends AbstractTransientBean {
 	 * Login Url
 	 **/
 	private String loginUrl;
+
+	/**
+	 * Please sign in message
+	 * <br/>
+	 * <p>Congratulations {0}! Your account is now active.</p><p>Please <a href="{1}">Sign in</a> with the email address {2}.</p>
+	 **/
+	private String pleaseSignIn;
+
+	/**
+	 * Sign in link
+	 * <br/>
+	 * <a href="{0}">Sign in</a>
+	 **/
+	private String signInLink;
+
+	/**
+	 * Account already activated
+	 * <br/>
+	 * <p>Welcome {0} - you have already activated your account.</p><p>Please <a href="{1}">Sign in</a>.</p>
+	 **/
+	private String alreadyActivated;
+
+	/**
+	 * No longer valid
+	 * <br/>
+	 * <p>Sorry, that code is no longer valid.</p><p>Please <a href="{0}">Sign in</a> or Register again to request a new activation email.</p>
+	 **/
+	private String noLongerValid;
+
+	/**
+	 * Not recognised
+	 * <br/>
+	 * <p>Sorry, that link is not recognised. Please check the link and try again.</p><p>Return to <a href="{0}">Sign in</a>.</p>
+	 **/
+	private String notRecognised;
 
 	@Override
 	@XmlTransient
@@ -236,6 +287,96 @@ public abstract class SelfRegistrationActivation extends AbstractTransientBean {
 	@XmlElement
 	public void setLoginUrl(String loginUrl) {
 		this.loginUrl = loginUrl;
+	}
+
+	/**
+	 * {@link #pleaseSignIn} accessor.
+	 * @return	The value.
+	 **/
+	public String getPleaseSignIn() {
+		return pleaseSignIn;
+	}
+
+	/**
+	 * {@link #pleaseSignIn} mutator.
+	 * @param pleaseSignIn	The new value.
+	 **/
+	@XmlElement
+	public void setPleaseSignIn(String pleaseSignIn) {
+		preset(pleaseSignInPropertyName, pleaseSignIn);
+		this.pleaseSignIn = pleaseSignIn;
+	}
+
+	/**
+	 * {@link #signInLink} accessor.
+	 * @return	The value.
+	 **/
+	public String getSignInLink() {
+		return signInLink;
+	}
+
+	/**
+	 * {@link #signInLink} mutator.
+	 * @param signInLink	The new value.
+	 **/
+	@XmlElement
+	public void setSignInLink(String signInLink) {
+		preset(signInLinkPropertyName, signInLink);
+		this.signInLink = signInLink;
+	}
+
+	/**
+	 * {@link #alreadyActivated} accessor.
+	 * @return	The value.
+	 **/
+	public String getAlreadyActivated() {
+		return alreadyActivated;
+	}
+
+	/**
+	 * {@link #alreadyActivated} mutator.
+	 * @param alreadyActivated	The new value.
+	 **/
+	@XmlElement
+	public void setAlreadyActivated(String alreadyActivated) {
+		preset(alreadyActivatedPropertyName, alreadyActivated);
+		this.alreadyActivated = alreadyActivated;
+	}
+
+	/**
+	 * {@link #noLongerValid} accessor.
+	 * @return	The value.
+	 **/
+	public String getNoLongerValid() {
+		return noLongerValid;
+	}
+
+	/**
+	 * {@link #noLongerValid} mutator.
+	 * @param noLongerValid	The new value.
+	 **/
+	@XmlElement
+	public void setNoLongerValid(String noLongerValid) {
+		preset(noLongerValidPropertyName, noLongerValid);
+		this.noLongerValid = noLongerValid;
+	}
+
+	/**
+	 * {@link #notRecognised} accessor.
+	 * @return	The value.
+	 **/
+	public String getNotRecognised() {
+		return notRecognised;
+	}
+
+	/**
+	 * {@link #notRecognised} mutator.
+	 * @param notRecognised	The new value.
+	 **/
+	@XmlElement
+	public void setNotRecognised(String notRecognised) {
+		preset(notRecognisedPropertyName, notRecognised);
+		this.notRecognised = notRecognised;
 	}
 
 	/**

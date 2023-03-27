@@ -3,36 +3,9 @@
 	xmlns="http://www.skyve.org/xml/view" xmlns:c="http://www.skyve.org/xml/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<tabPane>
 		<tab title="admin.dataMaintenance.edit.importExport.tabTitle">
-			<!-- Bizport not implemented for PF
-			<form border="true" borderTitle="Bizport">
-				<column />
-				<column />
-				<column />
-				<row>
-					<item>
-						<combo binding="modDocName" />
-					</item>
-				</row>
-				<row>
-					<item>
-						<spacer />
-					</item>
-					<item>
-						<button actionName="DataMaintenanceExportAction" pixelWidth="200" />
-					</item>
-				</row>
-				<row>
-					<item>
-						<spacer />
-					</item>
-					<item>
-						<button actionName="DataMaintenanceImportAction" pixelWidth="200" />
-					</item>
-				</row>
-			</form>
-			 -->
+			<!-- Bizport not implemented for PF -->
 			<vbox border="true" borderTitle="admin.dataMaintenance.edit.quickImportExport.tabTitle">
-				<listGrid continueConversation="false" query="qImportExport"></listGrid>
+				<listGrid continueConversation="false" query="qImportExport"/>
 			</vbox>
 		</tab>
 		<tab title="admin.dataMaintenance.edit.backupRestore.tabTitle">
@@ -189,10 +162,18 @@
 						<combo binding="evictOption" />
 					</item>
 					<item>
-						<checkBox binding="notification" triState="false" />
+						<checkBox binding="flagFailed" triState="false" />
 					</item>
 					<item>
 						<button action="RefreshDocumentTuples" />
+					</item>
+				</row>
+				<row>
+					<item colspan="4">
+						<spacer />
+					</item>
+					<item>
+						<checkBox binding="notification" triState="false" />
 					</item>
 				</row>
 			</form>

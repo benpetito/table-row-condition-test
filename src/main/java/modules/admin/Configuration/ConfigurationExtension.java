@@ -18,6 +18,7 @@ public class ConfigurationExtension extends Configuration {
 
 	private static final long serialVersionUID = -5669557826609528645L;
 	private static final String BACKUP_JOB_NAME = ".jBackup";
+	private static final String AVAILABLE_DISK_SPACE_ALARM_JOB_NAME = ".jAvailableDiskSpaceAlarm";
 
 	/**
 	 * The minimum length for new usernames
@@ -155,6 +156,15 @@ public class ConfigurationExtension extends Configuration {
 		return  (q.beanResult() != null);
 	}
 
+	
+	public static boolean validAvailableDiskSpaceAlarmSchedule() {
+		DocumentQuery q = CORE.getPersistence().newDocumentQuery(JobSchedule.MODULE_NAME, JobSchedule.DOCUMENT_NAME);
+		q.getFilter().addNullOrEquals(JobSchedule.disabledPropertyName, Boolean.FALSE);
+		q.getFilter().addEquals(JobSchedule.jobNamePropertyName, JobSchedule.MODULE_NAME + AVAILABLE_DISK_SPACE_ALARM_JOB_NAME);
+		
+		return  (q.beanResult() != null);
+	}
+	
 	/**
 	 * Self registration is validly configured if:
 	 * - userSelfRegistrationGroup has been assigned, and

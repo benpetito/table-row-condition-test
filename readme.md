@@ -1,3 +1,9 @@
+# Table Row Condition Test
+
+Proof of Concept Skyve application to demonstrate using a custom component builder to allow data grid to specify individual rows to be enabled or visible based on a condition.
+
+`Invoice` contains a data grid of `InvoiceItems`, which specifies custom change handlers on the `quantity` and `delivery` columns. The `type` column defines an editable condition, so that the type can only be changed when the quantity is > 0.
+
 ## Getting Started
 
 For instructions on importing your project into an IDE and configuring your development environment, please see the [getting started section](https://github.com/skyvers/skyve#detailed-instructions) of the Skyve readme on GitHub.

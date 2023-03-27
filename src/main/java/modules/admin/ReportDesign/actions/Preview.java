@@ -4,9 +4,13 @@ import modules.admin.ReportDesign.ReportDesignBizlet;
 import modules.admin.domain.ReportDesign;
 import org.skyve.content.MimeType;
 import org.skyve.domain.Bean;
-import org.skyve.impl.generate.jasperreports.*;
+import org.skyve.impl.generate.jasperreports.DesignSpecification;
+import org.skyve.impl.generate.jasperreports.JasperReportRenderer;
+import org.skyve.impl.generate.jasperreports.ReportDesignGenerator;
+import org.skyve.impl.generate.jasperreports.ReportDesignGeneratorFactory;
 import org.skyve.impl.persistence.AbstractPersistence;
-import org.skyve.impl.util.ReportUtil;
+import org.skyve.impl.report.jasperreports.JasperReportUtil;
+import org.skyve.metadata.controller.Download;
 import org.skyve.metadata.controller.DownloadAction;
 import org.skyve.metadata.customer.Customer;
 import org.skyve.metadata.model.document.Document;
@@ -16,20 +20,15 @@ import org.skyve.metadata.view.model.list.ListModel;
 import org.skyve.report.ReportFormat;
 import org.skyve.web.WebContext;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Preview extends DownloadAction<ReportDesign> {
-
-	private static final long serialVersionUID = -8203773871581974793L;
-
 	@Override
 	public void prepare(ReportDesign bean, WebContext webContext)
 	throws Exception {
-		// TODO Auto-generated method stub
-
+		// Nothing to see here
 	}
 
 	@Override
@@ -56,8 +55,8 @@ public class Preview extends DownloadAction<ReportDesign> {
 			final String queryName = designSpecification.getQueryName();
 			final String documentName = designSpecification.getDocumentName();
 			final String documentOrQueryOrModelName = queryName != null ? queryName : documentName;
-			final ListModel<Bean> listModel = ReportUtil.getDocumentQueryListModel(module, documentOrQueryOrModelName);
-			ReportUtil.runReport(reportRenderer.getReport(),
+			final ListModel<Bean> listModel = JasperReportUtil.getQueryListModel(module, documentOrQueryOrModelName);
+			JasperReportUtil.runReport(reportRenderer.getReport(),
 					user,
 					parameters,
 					// TODO: We could populate the list with random data.
@@ -66,7 +65,7 @@ public class Preview extends DownloadAction<ReportDesign> {
 					baos);
 		} else {
 			parameters.put(JasperReportRenderer.DESIGN_SPEC_PARAMETER_NAME, designSpecification);
-			ReportUtil.runReport(reportRenderer.getReport(),
+			JasperReportUtil.runReport(reportRenderer.getReport(),
 					user,
 					document,
 					parameters,
@@ -78,7 +77,7 @@ public class Preview extends DownloadAction<ReportDesign> {
 
 
 
-		return new Download(reportName, new ByteArrayInputStream(baos.toByteArray()), MimeType.pdf);
+		return new Download(reportName, baos.toByteArray(), MimeType.pdf);
 	}
 
 }

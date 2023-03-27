@@ -9,6 +9,7 @@ import javax.faces.component.UIComponentBase;
 import org.apache.commons.lang3.StringUtils;
 import org.skyve.domain.types.converters.Converter;
 import org.skyve.domain.types.converters.Format;
+import org.skyve.impl.metadata.view.HorizontalAlignment;
 import org.skyve.impl.metadata.view.event.RerenderEventAction;
 import org.skyve.impl.metadata.view.widget.bound.input.CheckBox;
 import org.skyve.impl.metadata.view.widget.bound.input.Combo;
@@ -16,6 +17,7 @@ import org.skyve.impl.metadata.view.widget.bound.input.TextField;
 import org.skyve.impl.metadata.view.widget.bound.tabular.AbstractDataWidget;
 import org.skyve.impl.metadata.view.widget.bound.tabular.DataGridBoundColumn;
 import org.skyve.impl.web.faces.pipeline.component.ResponsiveComponentBuilder;
+import org.skyve.util.Util;
 
 /**
  * Custom component builder to allow data grid to specify individual rows to be enabled
@@ -25,6 +27,7 @@ import org.skyve.impl.web.faces.pipeline.component.ResponsiveComponentBuilder;
  */
 public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 	// names of the properties to refer to within the data grid
+	public static final String COLLECTION_BINDING_KEY = COLLECTION_BINDING_ATTRIBUTE_KEY;
 	public static final String EDITABLE_CONDITION_KEY = "editableCondition";
 	public static final String VISIBLE_CONDITION_KEY = "visibleCondition";
 	public static final String RERENDER_KEY = "rerender";
@@ -33,15 +36,22 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 			boundColumnVisibleCondition,
 			boundColumnProcess,
 			boundColumnUpdate,
+			collectionBinding,
 			rerenderEventName;
 	
 	@Override
 	public UIComponent addDataGridBoundColumn(UIComponent component, UIComponent current, AbstractDataWidget widget,
 			DataGridBoundColumn column, String dataWidgetVar, String columnTitle, String columnBinding,
-			StringBuilder gridColumnExpression) {
+			StringBuilder gridColumnExpression, HorizontalAlignment alignment) {
 		final UIComponent col = super.addDataGridBoundColumn(component, current, widget, column, dataWidgetVar, columnTitle,
 				columnBinding,
-				gridColumnExpression);
+				gridColumnExpression,
+				alignment);
+
+		final String collectionBindingName = column.getProperties().get(COLLECTION_BINDING_KEY);
+		if (StringUtils.isNotBlank(collectionBindingName)) {
+			collectionBinding = collectionBindingName;
+		}
 
 		final String editableCondition = column.getProperties().get(EDITABLE_CONDITION_KEY);
 		if (StringUtils.isNotBlank(editableCondition)) {
@@ -70,7 +80,7 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 		final UIComponent checkBoxField = eventSource.getComponent();
 
 		if (StringUtils.isNotBlank(rerenderEventName)) {
-			addBoundColumnRerenderEvent((UIComponentBase) checkBoxField, null, dataWidgetVar, checkBox.getBinding());
+			addBoundColumnRerenderEvent((UIComponentBase) checkBoxField, collectionBinding, dataWidgetVar, checkBox.getBinding());
 			rerenderEventName = null;
 		}
 
@@ -125,7 +135,7 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 
 	private void addBoundColumnRerenderEvent(UIComponentBase componentBase, String collectionBinding, String listVar, String binding) {
         final RerenderEventAction rerenderEventAction = new RerenderEventAction();
-        rerenderEventAction.setClientValidation(true);
+		rerenderEventAction.setClientValidation(Boolean.TRUE);
 
         if (StringUtils.isNotBlank(boundColumnProcess)) {
             rerenderEventAction.getProperties().put(PROCESS_KEY, boundColumnProcess);
@@ -135,6 +145,7 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
             rerenderEventAction.getProperties().put(UPDATE_KEY, boundColumnUpdate);
             boundColumnUpdate = null;
         }
+		Util.LOGGER.info("addAjaxBehaviour collectionBinding:" + collectionBinding);
         addAjaxBehavior(componentBase, rerenderEventName, collectionBinding, listVar, binding,
                 Collections.singletonList(rerenderEventAction));
     }

@@ -93,8 +93,8 @@
 							<spacer />
 						</item>
 						<item colspan="2">
-							<blurb>
-								<![CDATA[<i>{combinationExplanation}</i>]]>
+							<blurb escape="false">
+								<![CDATA[<em>{combinationExplanation}</em>]]>
 							</blurb>
 						</item>
 					</row>

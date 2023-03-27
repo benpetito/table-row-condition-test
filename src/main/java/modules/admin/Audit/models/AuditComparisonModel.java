@@ -4,14 +4,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import modules.admin.domain.Audit;
-import modules.admin.domain.Audit.Operation;
-
 import org.skyve.CORE;
 import org.skyve.domain.Bean;
+import org.skyve.domain.types.converters.Converter;
+import org.skyve.domain.types.converters.enumeration.DynamicEnumerationConverter;
 import org.skyve.impl.bind.BindUtil;
 import org.skyve.impl.metadata.model.document.field.Enumeration;
-import org.skyve.impl.metadata.repository.AbstractRepository;
 import org.skyve.impl.metadata.view.widget.bound.input.TextField;
 import org.skyve.metadata.MetaDataException;
 import org.skyve.metadata.customer.Customer;
@@ -26,12 +24,13 @@ import org.skyve.metadata.view.model.comparison.ComparisonModel;
 import org.skyve.metadata.view.model.comparison.ComparisonProperty;
 import org.skyve.persistence.Persistence;
 import org.skyve.util.Binder;
-import org.skyve.util.JSON;
 import org.skyve.util.Binder.TargetMetaData;
+import org.skyve.util.JSON;
+
+import modules.admin.domain.Audit;
+import modules.admin.domain.Audit.Operation;
 
 public class AuditComparisonModel extends ComparisonModel<Audit, Audit> {
-	private static final long serialVersionUID = 5964879680504956032L;
-
 	@Override
 	public ComparisonComposite getComparisonComposite(Audit me) throws Exception {
 		Audit sourceVersion = me.getSourceVersion();
@@ -210,15 +209,24 @@ public class AuditComparisonModel extends ComparisonModel<Audit, Audit> {
 				property.setWidget(attribute.getDefaultInputWidget());
 
 				Class<?> type = null;
+				Converter<?> converter = null;
 				if (attribute instanceof Enumeration) {
-					type = AbstractRepository.get().getEnum((Enumeration) attribute);
+					Enumeration e = (Enumeration) attribute;
+					e = e.getTarget();
+					if (e.isDynamic()) {
+						type = String.class;
+						converter = new DynamicEnumerationConverter(e);
+					}
+					else {
+						type = e.getEnum();
+					}
 				}
 				else {
 					type = attribute.getAttributeType().getImplementingType();
 				}
 
 				if (value instanceof String) {
-					value = BindUtil.fromString(c, null, type, (String) value, true);
+					value = BindUtil.fromSerialised(converter, type, (String) value);
 				}
 				else {
 					value = BindUtil.convert(type, value);
@@ -258,16 +266,25 @@ public class AuditComparisonModel extends ComparisonModel<Audit, Audit> {
 				}
 
 				if (attribute != null) {
+					Converter<?> converter = null;
 					Class<?> type = null;
 					if (attribute instanceof Enumeration) {
-						type = AbstractRepository.get().getEnum((Enumeration) attribute);
+						Enumeration e = (Enumeration) attribute;
+						e = e.getTarget();
+						if (e.isDynamic()) {
+							type = String.class;
+							converter = new DynamicEnumerationConverter(e);
+						}
+						else {
+							type = e.getEnum();
+						}
 					}
 					else {
 						type = attribute.getAttributeType().getImplementingType();
 					}
 
 					if (value instanceof String) {
-						value = BindUtil.fromString(c, null, type, (String) value, true);
+						value = BindUtil.fromSerialised(converter, type, (String) value);
 					}
 					else {
 						value = BindUtil.convert(type, value);

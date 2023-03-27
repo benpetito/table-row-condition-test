@@ -1,12 +1,13 @@
 package modules.admin.User;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
 import org.skyve.CORE;
 import org.skyve.domain.Bean;
 import org.skyve.domain.types.DateTime;
-import org.skyve.impl.metadata.repository.AbstractRepository;
+import org.skyve.impl.metadata.repository.ProvidedRepositoryFactory;
 import org.skyve.impl.metadata.user.UserImpl;
 import org.skyve.impl.persistence.hibernate.AbstractHibernatePersistence;
 import org.skyve.impl.util.SQLMetaDataUtil;
@@ -19,13 +20,15 @@ import org.skyve.metadata.user.Role;
 import org.skyve.persistence.Persistence;
 import org.skyve.util.BeanVisitor;
 import org.skyve.util.Binder;
+import org.skyve.util.CommunicationUtil;
+import org.skyve.util.CommunicationUtil.ResponseMode;
 import org.skyve.util.Util;
 
-import modules.admin.Communication.CommunicationUtil;
-import modules.admin.Communication.CommunicationUtil.ResponseMode;
+import modules.admin.UserProxy.UserProxyExtension;
 import modules.admin.domain.Contact;
 import modules.admin.domain.SelfRegistrationActivation;
 import modules.admin.domain.User;
+import modules.admin.domain.UserProxy;
 import modules.admin.domain.UserRole;
 
 public class UserExtension extends User {
@@ -90,16 +93,20 @@ public class UserExtension extends User {
 	 * @return the metadata user that is this user
 	 */
 	public org.skyve.metadata.user.User toMetaDataUser() {
-
-		UserImpl metaDataUser  = null;
-		if(isPersisted()) {
+		UserImpl result = null;
+		
+		if (isPersisted()) {
 			// Populate the user using the persistence connection since it might have just been inserted and not committed yet
-			metaDataUser = AbstractRepository.setCustomerAndUserFromPrincipal((UtilImpl.CUSTOMER == null) ? getBizCustomer() + "/" + getUserName() : getUserName());
-			metaDataUser.clearAllPermissionsAndMenus();
-			SQLMetaDataUtil.populateUser(metaDataUser, ((AbstractHibernatePersistence) CORE.getPersistence()).getConnection());
+			result = ProvidedRepositoryFactory.setCustomerAndUserFromPrincipal((UtilImpl.CUSTOMER == null) ? getBizCustomer() + "/" + getUserName() : getUserName());
+			result.clearAllPermissionsAndMenus();
+			
+			// Use the current persistence connection, so do not close
+			@SuppressWarnings("resource")
+			Connection c = ((AbstractHibernatePersistence) CORE.getPersistence()).getConnection();
+			SQLMetaDataUtil.populateUser(result, c);
 		}
 
-		return metaDataUser;
+		return result;
 	}
 
 	/**
@@ -141,13 +148,13 @@ public class UserExtension extends User {
 	public void sendUserRegistrationEmail() throws Exception {
 		Util.LOGGER.info("Sending registration email to " + this.getContact().getEmail1());
 		CommunicationUtil.sendFailSafeSystemCommunication(SELF_REGISTRATION_COMMUNICATION,
-				"{contact.email1}",
-				null,
-				SELF_REGISTRATION_SUBJECT,
-				SELF_REGISTRATION_BODY,
-				ResponseMode.EXPLICIT,
-				null,
-				this);
+															"{contact.email1}",
+															null,
+															SELF_REGISTRATION_SUBJECT,
+															SELF_REGISTRATION_BODY,
+															ResponseMode.EXPLICIT,
+															null,
+															this);
 	}
 
 	/**
@@ -199,5 +206,28 @@ public class UserExtension extends User {
 			return true;
 		}
 	}
+	
+	/**
+	 * Return a user proxy from the user
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public UserProxyExtension toUserProxy() {
+		UserProxyExtension result = UserProxy.newInstance();
+		result.setUserName(getUserName());
+		result.setCreatedDateTime(new DateTime());
+		result.setContact(getContact());
+		result.setInactive(getInactive());
 
+		return result;
+	}
+
+	/**
+	 * Whether the currently logged in user is this user
+	 * @return
+	 */
+	public boolean owningUser() {
+		return CORE.getPersistence().getUser().getId().equals(getBizId());
+	}
 }

@@ -17,6 +17,7 @@
 		<job name="jRefreshDocumentTuples" displayName="Refresh Persisted Document Data" className="modules.admin.DataMaintenance.RefreshDocumentTuplesJob"/>
 		<job name="jBulkUserCreation" displayName="Create Users" className="modules.admin.UserList.BulkUserCreationJob"/>
 		<job name="jGenerateTestData" displayName="Generate Test Data" className="modules.admin.ControlPanel.GenerateTestDataJob"/>
+		<job name="jAvailableDiskSpaceAlarm" displayName="Available Disk Space Alarm" className="modules.admin.Configuration.AvailableDiskSpaceAlarmJob"/>
 	</jobs>
 	<documents>
 		<document ref="Audit" defaultQueryName="qAudits" />
@@ -32,6 +33,8 @@
 		<document ref="DocumentCreator" />
 		<document ref="DocumentNumber" defaultQueryName="qDocumentNumbers"/>
 		<document ref="DownloadFolder" />
+		<document ref="DynamicEntity" />
+		<document ref="DynamicRelation" />
 		<document ref="Generic" />
 		<document ref="Group" />
 		<document ref="GroupRole" />
@@ -42,7 +45,11 @@
 		<document ref="JobSchedule" defaultQueryName="qAllSchedules" />
 		<document ref="ModuleDocument" />
 		<document ref="ReportDesign" />
-		<document ref="SelfRegistration" />		
+		<document ref="ReportDataset" />
+		<document ref="ReportParameter" />
+		<document ref="ReportManager" />
+		<document ref="ReportTemplate" defaultQueryName="qReportTemplates" />
+		<document ref="SelfRegistration" />
 		<document ref="SelfRegistrationActivation" />
 		<document ref="Snapshot" defaultQueryName="qSnapshots" />
 		<document ref="Startup"/>
@@ -64,25 +71,25 @@
 		<role name="Anonymous">
 			<description>admin.adminRoles.anonymous.description</description>
 			<privileges>
-				<document name="Communication" permission="_R__G"/>
-				<document name="CommunicationTemplate" permission="_R__G"/>
-				<document name="Configuration" permission="_R__C" />				
-				<document name="DocumentNumber" permission="CRU_C" />
-				<document name="Generic" permission="CRUDG"/>
 				<document name="SelfRegistration" permission="_____">
 					<action name="Register" />
 				</document>
 				<document name="SelfRegistrationActivation" permission="_____"/>
-				<document name="Subscription" permission="CRUDG"/>
-				<document name="User" permission="_R__C" />				
+				<document name="Subscription" permission="_____"/>
 			</privileges>
+			<accesses>
+				<singular document="SelfRegistration" />
+				<singular document="SelfRegistrationActivation" />
+			</accesses>
 		</role>
 		<role name="AppUser">
 			<documentation>
 				The App User role is intended for retail and public users interacting through the "front office". 
 				These users are assumed to operate within their own scope and have only visibility to their own data.
 				
-				App Users can create their own contacts, and change their own passwords.			
+				App Users can create their own contacts, and change their own passwords.
+				
+				App Users can execute reports if given access via another module.			
 			</documentation>
 			<description>admin.adminRoles.appUser.description</description>
 			<privileges>
@@ -90,7 +97,13 @@
 					<action name="MakePasswordChange" />
 				</document>
 				<document name="Contact" permission="CRUDU" />
-				<document name="Generic" permission="CRUDG"/>
+				<document name="DynamicEntity" permission="CRUDD" />
+				<document name="DynamicRelation" permission="CRUDD" />
+				<document name="Generic" permission="CRUDG" />
+				<document name="ReportTemplate" permission="_R__C">
+					<action name="DownloadJasperReport" />
+					<action name="DownloadReport" />
+				</document>
 				<document name="User" permission="_RU_U" />
 				<document name="UserDashboard" permission="CR__U">
 					<action name="UpdateMyDetails" />
@@ -115,7 +128,9 @@
 				The role is for a typical office situation where users collaborate within the "Customer" scope on key application areas.
 				
 				For example, shared contact management, common document number serials 
-				and the ability to use Skyve's basic personal efficiency and automation capabilities, Tags, Snapshots, Communication and view dashboards.			
+				and the ability to use Skyve's basic personal efficiency and automation capabilities, Tags, Snapshots, Communication and view dashboards.
+				
+				BasicUser can know of the existence of other users and refer to them, but cannot change their user record.			
 			</documentation>
 			<description>admin.adminRoles.basicUser.description</description>
 			<privileges>
@@ -127,8 +142,15 @@
 				<document name="Configuration" permission="_R__C" />
 				<document name="Contact" permission="_RU_C" />
 				<document name="DocumentNumber" permission="CRUDC" />
+				<document name="DynamicEntity" permission="CRUDD" />
+				<document name="DynamicRelation" permission="CRUDD" />
 				<document name="Generic" permission="CRUDG"/>
 				<document name="Job" permission="_R__U" />
+				<document name="ReportTemplate" permission="_RU_C">
+					<action name="AddUserToEmail" />
+					<action name="DownloadJasperReport" />
+					<action name="DownloadReport" />
+				</document>
 				<document name="Snapshot" permission="CRUDU">
 					<action name="CopySnapshotToUser" />
 				</document>
@@ -220,6 +242,7 @@
 					<action name="Backup" />
 					<action name="BackupSelected" />
 					<action name="CheckContent" />
+					<action name="CollectContentGarbage" />
 					<action name="ContentSelected" />
 					<action name="DataMaintenanceExportAction" />
 					<action name="DataMaintenanceImportAction" />
@@ -257,6 +280,26 @@
 				<document name="ReportDesign" permission="_____">
 					<action name="GenerateDefault" />
 					<action name="Preview" />
+				</document>
+				<document name="ReportDataset" permission="CRUDC">
+					<action name="TestQuery" />
+				</document>
+				<document name="ReportTemplate" permission="CRUDC">
+					<action name="AddUserToEmail" />
+					<action name="Back" />
+					<action name="CopyReport" />
+					<action name="DownloadJasperReport" />
+					<action name="DownloadReport" />
+					<action name="DownloadTemplate" />
+					<action name="ExportReportSpecification" />
+					<action name="Next" />
+					<action name="TestJasperReport" />
+					<action name="TestReport" />
+				</document>
+				<document name="ReportParameter" permission="CRUDC"/>
+				<document name="ReportManager" permission="_____">
+					<action name="ExportReportSpecifications"/>
+					<action name="ImportReportSpecifications"/>
 				</document>
 				<document name="UserMonthlyHits" permission="_R__C" />
 				<document name="UserToken" permission="CRUDC" />
@@ -317,10 +360,17 @@
 				<document name="DataGroup" permission="CRUDC" />
 				<document name="DocumentNumber" permission="CRUDC" />
 				<document name="DownloadFolder" permission="CRUDC" />
+				<document name="DynamicEntity" permission="CRUDD" />
+				<document name="DynamicRelation" permission="CRUDD" />
 				<document name="Generic" permission="CRUDG"/>
 				<document name="Group" permission="CRUDC" />
 				<document name="GroupRole" permission="CRUDC" />
 				<document name="Job" permission="_R__C" />
+				<document name="ReportTemplate" permission="_R__C">
+					<action name="AddUserToEmail" />
+					<action name="DownloadJasperReport" />
+					<action name="DownloadReport" />
+				</document>
 				<document name="SelfRegistration" permission="_RUDC">
 					<action name="Register"/>
 				</document>
@@ -348,6 +398,9 @@
 				<document name="UserProxy" permission="_RU_C" />
 				<document name="UserRole" permission="CRUDC" />
 			</privileges>
+			<accesses>
+				<singular document="Startup" />
+			</accesses>
 		</role>
 		<role name="ViewUser">
 			<documentation>
@@ -360,6 +413,8 @@
 				</document>
 				<document name="Contact" permission="_R__C" />
 				<document name="DocumentNumber" permission="_R__C" />
+				<document name="DynamicEntity" permission="_R__D" />
+				<document name="DynamicRelation" permission="_R__D" />
 				<document name="Generic" permission="CRUDG"/>
 				<document name="Job" permission="_R__U" />
 				<document name="Snapshot" permission="CRUDU" />
@@ -437,13 +492,29 @@
 				<uxui name="tablet" />
 				<role name="DevOps" />
 			</edit>
-			<edit document="ReportDesign" name="admin.adminMenu.reportDesign.document.displayName">
+			<list document="UserMonthlyHits" name="User Hits" autoPopulate="false">
 				<uxui name="desktop" />
 				<role name="DevOps" />
+			</list>
+		</group>
+		<group name="Reports">
+			<list name="Reports" query="qEnabledReports">
+				<uxui name="external" />
+				<uxui name="tablet"/>
+				<role name="BasicUser"/>
+			</list>
+			<edit name="Report Manager" document="ReportManager">
+				<uxui name="desktop" />
+				<role name="DevOps"/>
 			</edit>
-			<list document="UserMonthlyHits" name="admin.adminMenu.userMonthlyHits.list.displayName" autoPopulate="false">
+			<list name="Report Designer" document="ReportTemplate">
 				<uxui name="desktop" />
-				<role name="DevOps" />
+				<role name="DevOps"/>
+			</list>
+			<list name="Report Schedules" query="qReportSchedules">
+				<uxui name="desktop" />
+				<role name="DevOps"/>
+				<role name="SecurityAdministrator"/>
 			</list>
 		</group>
 		<list document="Snapshot" name="admin.adminMenu.snapshots.list.displayName">
@@ -621,6 +692,7 @@
 			<description>The list of all job schedule entries</description>
 			<columns>
 				<column binding="bizKey" sortOrder="ascending" />
+				<column binding="scheduleString" sortable="false" filterable="false" editable="false"/>
 				<column binding="startTime" sortOrder="ascending" pixelWidth="150" />
 				<column binding="endTime" pixelWidth="150"/>
 				<column binding="disabled" pixelWidth="150"/>
@@ -701,7 +773,7 @@
 				<column binding="description" />
 				<column binding="template" sanitise="relaxed" escape="false"/>
 			</columns>
-		</query>		
+		</query>
 		<query name="qSubscriptions" documentName="Subscription">
 			<description>Subscriptions</description>
 			<columns>
@@ -749,5 +821,36 @@
                 <column binding="documentNumber" />
             </columns>
         </query>
+        <query documentName="ReportTemplate" name="qEnabledReports">
+			<description><![CDATA[All Reports]]></description>
+			<filter>bean.includeFragment = false and bean.enabled = true</filter>
+			<columns>
+				<column binding="name" sortOrder="ascending" />
+				<column binding="description" />
+			</columns>
+		</query>
+        <query documentName="ReportTemplate" name="qReportSchedules">
+			<documentation>Shows the schedules for enabled reports.</documentation>
+			<description><![CDATA[All Report Schedules]]></description>
+			<filter>bean.includeFragment = false and bean.enabled = true</filter>
+			<columns>
+				<column binding="name" sortOrder="ascending" />
+				<column binding="description" />
+				<column binding="scheduleDescription" editable="false" filterable="false" sortable="false" />
+			</columns>
+		</query>
+		<query documentName="ReportTemplate" name="qReportTemplates">
+			<description><![CDATA[All Report Templates]]></description>
+			<columns>
+				<column binding="name" sortOrder="ascending" />
+				<column binding="description" />
+				<column binding="enabled" />
+				<column binding="includeFragment" />
+				<column binding="outputFormat" displayName="Format" pixelWidth="80" />
+				<column binding="reportType" hidden="true" />
+				<column binding="templateName" />
+				<column binding="template" hidden="true" />
+			</columns>
+		</query>
 	</queries>
 </module>

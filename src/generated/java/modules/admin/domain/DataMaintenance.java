@@ -20,6 +20,7 @@ import org.skyve.impl.domain.AbstractPersistentBean;
 import org.skyve.impl.domain.ChangeTrackingArrayList;
 import org.skyve.impl.domain.types.jaxb.TimestampMapper;
 import org.skyve.metadata.model.document.Bizlet.DomainValue;
+import org.skyve.util.Util;
 
 /**
  * Data Maintenance
@@ -139,6 +140,9 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 	/** @hidden */
 	public static final String evictOptionPropertyName = "evictOption";
 
+	/** @hidden */
+	public static final String flagFailedPropertyName = "flagFailed";
+
 	/**
 	 * Pre-Process
 	 **/
@@ -174,8 +178,8 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -196,11 +200,11 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static RestorePreProcess fromDescription(String description) {
+		public static RestorePreProcess fromLocalisedDescription(String description) {
 			RestorePreProcess result = null;
 
 			for (RestorePreProcess value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -252,8 +256,8 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -274,11 +278,11 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static ContentRestoreOption fromDescription(String description) {
+		public static ContentRestoreOption fromLocalisedDescription(String description) {
 			ContentRestoreOption result = null;
 
 			for (ContentRestoreOption value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -331,8 +335,8 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -353,11 +357,11 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static RestoreIndexingOption fromDescription(String description) {
+		public static RestoreIndexingOption fromLocalisedDescription(String description) {
 			RestoreIndexingOption result = null;
 
 			for (RestoreIndexingOption value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -408,8 +412,8 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -430,11 +434,11 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static RefreshOption fromDescription(String description) {
+		public static RefreshOption fromLocalisedDescription(String description) {
 			RefreshOption result = null;
 
 			for (RefreshOption value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -489,8 +493,8 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -511,11 +515,11 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static EvictOption fromDescription(String description) {
+		public static EvictOption fromLocalisedDescription(String description) {
 			EvictOption result = null;
 
 			for (EvictOption value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -689,6 +693,13 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 <p>Evicting beans will free memory for large data jobs, however there may be impacts if the action (processing) selected affects items that other beans may reference.</p>
 	 **/
 	private EvictOption evictOption = EvictOption.bean;
+
+	/**
+	 * Flag Failed 
+	 * <br/>
+	 * Flag records that fail to Save/Upsert
+	 **/
+	private Boolean flagFailed = Boolean.valueOf(false);
 
 	@Override
 	@XmlTransient
@@ -1305,6 +1316,23 @@ public abstract class DataMaintenance extends AbstractPersistentBean {
 	@XmlElement
 	public void setEvictOption(EvictOption evictOption) {
 		this.evictOption = evictOption;
+	}
+
+	/**
+	 * {@link #flagFailed} accessor.
+	 * @return	The value.
+	 **/
+	public Boolean getFlagFailed() {
+		return flagFailed;
+	}
+
+	/**
+	 * {@link #flagFailed} mutator.
+	 * @param flagFailed	The new value.
+	 **/
+	@XmlElement
+	public void setFlagFailed(Boolean flagFailed) {
+		this.flagFailed = flagFailed;
 	}
 
 	/**

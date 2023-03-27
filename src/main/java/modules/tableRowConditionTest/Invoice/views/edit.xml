@@ -35,6 +35,7 @@
 	        </boundColumn>
 	        <boundColumn binding="delivery">
 	        	<properties>
+	        		<c:property key="collectionBinding">items</c:property>
 	        		<c:property key="rerender">change</c:property>
 	        	</properties>
 	        </boundColumn>

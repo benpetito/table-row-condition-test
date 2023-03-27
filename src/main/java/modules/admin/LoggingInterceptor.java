@@ -11,15 +11,13 @@ import org.skyve.domain.messages.ValidationException;
 import org.skyve.metadata.controller.ImplicitActionName;
 import org.skyve.metadata.controller.Interceptor;
 import org.skyve.metadata.controller.ServerSideActionResult;
-import org.skyve.metadata.controller.UploadAction.UploadedFile;
+import org.skyve.metadata.controller.Upload;
 import org.skyve.metadata.model.document.Bizlet.DomainValue;
 import org.skyve.metadata.model.document.Document;
 import org.skyve.util.Util;
 import org.skyve.web.WebContext;
 
 public class LoggingInterceptor extends Interceptor {
-	private static final long serialVersionUID = 6991646689104206033L;
-
 	private boolean veto = false;
 	
 	@Override
@@ -174,18 +172,18 @@ public class LoggingInterceptor extends Interceptor {
 	}
 
 	@Override
-	public boolean beforeUploadAction(Document document, String actionName, Bean bean, UploadedFile file, WebContext webContext) {
+	public boolean beforeUploadAction(Document document, String actionName, Bean bean, Upload upload, WebContext webContext) {
 		Util.LOGGER.log(Level.INFO, 
 							"beforeUploadAction - doc = {0}.{1}, action = {2}, bean = {3}, file = {4}",
-							new Object[] {document.getOwningModuleName(), document.getName(), actionName, bean, file});
+							new Object[] {document.getOwningModuleName(), document.getName(), actionName, bean, upload});
 		return veto;
 	}
 
 	@Override
-	public void afterUploadAction(Document document, String actionName, Bean bean, UploadedFile file, WebContext webContext) {
+	public void afterUploadAction(Document document, String actionName, Bean bean, Upload upload, WebContext webContext) {
 		Util.LOGGER.log(Level.INFO, 
 							"afterUploadAction - doc = {0}.{1}, action = {2}, bean = {3}, file = {4}",
-							new Object[] {document.getOwningModuleName(), document.getName(), actionName, bean, file});
+							new Object[] {document.getOwningModuleName(), document.getName(), actionName, bean, upload});
 	}
 
 	@Override

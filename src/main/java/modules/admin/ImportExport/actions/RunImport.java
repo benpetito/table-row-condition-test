@@ -33,8 +33,6 @@ import modules.admin.domain.ImportExportColumn;
 
 public class RunImport implements ServerSideAction<ImportExport> {
 
-	private static final long serialVersionUID = 7301976416286938546L;
-
 	@Override
 	public ServerSideActionResult<ImportExport> execute(ImportExport bean, WebContext webContext)
 			throws Exception {
@@ -135,7 +133,7 @@ public class RunImport implements ServerSideAction<ImportExport> {
 						default:
 							break;
 						}
-						sb.append(" using load action ").append(col.getLoadAction().toDescription());
+						sb.append(" using load action ").append(col.getLoadAction().toLocalisedDescription());
 					}
 
 					if (loader.isDebugMode()) {

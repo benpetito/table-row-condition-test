@@ -1,5 +1,9 @@
 package util;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
+
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.jboss.weld.environment.se.Weld;
 import org.junit.jupiter.api.AfterAll;
@@ -7,19 +11,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.skyve.EXT;
-import org.skyve.cache.CacheUtil;
 import org.skyve.impl.cdi.SkyveCDIProducer;
 import org.skyve.impl.content.AbstractContentManager;
 import org.skyve.impl.content.NoOpContentManager;
-import org.skyve.impl.metadata.repository.AbstractRepository;
+import org.skyve.impl.metadata.repository.ProvidedRepositoryFactory;
 import org.skyve.impl.metadata.repository.LocalDesignRepository;
 import org.skyve.impl.metadata.user.SuperUser;
 import org.skyve.impl.persistence.AbstractPersistence;
+import org.skyve.impl.persistence.RDBMSDynamicPersistence;
 import org.skyve.impl.persistence.hibernate.HibernateContentPersistence;
 import org.skyve.impl.util.UtilImpl;
 import org.skyve.metadata.model.document.SingletonCachedBizlet;
 import org.skyve.persistence.DataStore;
 import org.skyve.util.DataBuilder;
+import org.skyve.util.FileUtil;
 import org.skyve.util.test.SkyveFixture;
 
 import modules.WeldMarker;
@@ -27,11 +32,10 @@ import modules.admin.User.UserExtension;
 import modules.admin.domain.User;
 
 
-public class AbstractH2TestForJUnit5
-{
+public class AbstractH2TestForJUnit5 {
     protected static final String USER = "TestUser";
     protected static final String PASSWORD = "TestPassword0!";
-    protected static final String CUSTOMER = "bizhub";
+	protected static final String CUSTOMER = "skyve";
 
     private static final String DB_DIALECT = "org.skyve.impl.persistence.hibernate.dialect.H2SpatialDialect";
     private static final String DB_DRIVER = "org.h2.Driver";
@@ -53,12 +57,12 @@ public class AbstractH2TestForJUnit5
 
 
     @BeforeAll
+	@SuppressWarnings("resource")
 	public static void setUp() {
         // init the cache once
-        UtilImpl.CONTENT_DIRECTORY = CONTENT_DIRECTORY;
-        if (CacheUtil.isUnInitialised()) {
-            CacheUtil.init();
-        }
+		UtilImpl.CONTENT_DIRECTORY = CONTENT_DIRECTORY + UUID.randomUUID().toString() + "/";
+
+        EXT.getCaching().startup();
 
         // init injection
         weld = new Weld();
@@ -69,23 +73,32 @@ public class AbstractH2TestForJUnit5
     }
 
 	@AfterAll
-	public static void tearDown() {
+	public static void tearDown() throws IOException {
 		if (weld != null) {
 			weld.shutdown();
 		}
+
+		// clean up any temporary content directories after shutdown
+		File contentDir = new File(UtilImpl.CONTENT_DIRECTORY);
+		if (contentDir.exists()) {
+			FileUtil.delete(contentDir);
+		}
 	}
 
-    @BeforeEach
+	@BeforeEach
+    @SuppressWarnings("static-method")
     public void beforeBase() throws Exception {
         AbstractPersistence.IMPLEMENTATION_CLASS = HibernateContentPersistence.class;
+		AbstractPersistence.DYNAMIC_IMPLEMENTATION_CLASS = RDBMSDynamicPersistence.class;
         AbstractContentManager.IMPLEMENTATION_CLASS = NoOpContentManager.class;
         UtilImpl.DATA_STORE = new DataStore(DB_DRIVER, DB_URL, DB_UNAME, DB_PWD, DB_DIALECT);
         UtilImpl.DATA_STORES.put("test", UtilImpl.DATA_STORE);
         UtilImpl.DDL_SYNC = true;
         UtilImpl.SQL_TRACE = false;
         UtilImpl.QUERY_TRACE = false;
+		UtilImpl.JOB_SCHEDULER = false;
 
-        AbstractRepository.set(new LocalDesignRepository());
+        ProvidedRepositoryFactory.set(new LocalDesignRepository());
 
         final SuperUser user = new SuperUser();
         user.setCustomerName(CUSTOMER);
@@ -101,7 +114,8 @@ public class AbstractH2TestForJUnit5
         persistence.save(adminUser);
     }
 
-    @AfterEach
+	@AfterEach
+    @SuppressWarnings("static-method")
     public void afterBase() {
         final AbstractPersistence persistence = AbstractPersistence.get();
         persistence.rollback();

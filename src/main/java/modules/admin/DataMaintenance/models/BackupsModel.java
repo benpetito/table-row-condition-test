@@ -24,8 +24,6 @@ import modules.admin.domain.DataMaintenance;
 import modules.admin.domain.DownloadFolder;
 
 public class BackupsModel extends ListModel<DataMaintenance> {
-	private static final long serialVersionUID = -7192916420761744760L;
-
 	private Document drivingDocument = null;
 	private Set<String> projections = new TreeSet<>();
 	private List<MetaDataQueryColumn> columns = new ArrayList<>(1);
@@ -68,13 +66,13 @@ public class BackupsModel extends ListModel<DataMaintenance> {
 	}
 
 	@Override
-	public Filter getFilter() throws Exception {
+	public Filter getFilter() {
 		// not required
 		return null;
 	}
 
 	@Override
-	public Filter newFilter() throws Exception {
+	public Filter newFilter() {
 		// not required
 		return null;
 	}

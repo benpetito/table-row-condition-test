@@ -13,13 +13,11 @@ import org.skyve.web.WebContext;
 import modules.admin.domain.DataMaintenance;
 
 public class DeleteBackup implements ServerSideAction<DataMaintenance> {
-	private static final long serialVersionUID = 5306067916641877356L;
-
 	@Override
 	public ServerSideActionResult<DataMaintenance> execute(DataMaintenance bean, WebContext webContext)
-	throws Exception {
+			throws Exception {
 		String customerName = CORE.getUser().getCustomerName();
-		
+
 		// delete external backup if enabled
 		if (ExternalBackup.areExternalBackupsEnabled()) {
 			String backupName = bean.getSelectedBackupName();
@@ -30,20 +28,19 @@ public class DeleteBackup implements ServerSideAction<DataMaintenance> {
 			} else {
 				Util.LOGGER.info("Backup " + backupName + " no longer exists");
 			}
+		}
+		// delete from local content
+		File backup = new File(String.format("%sbackup_%s%s%s",
+				Util.getContentDirectory(),
+				customerName,
+				File.separator,
+				bean.getSelectedBackupName()));
+		if (backup.exists()) {
+			Util.LOGGER.info("Deleting backup " + backup.getAbsolutePath());
+			FileUtil.delete(backup);
+			Util.LOGGER.info("Deleted backup " + backup.getAbsolutePath());
 		} else {
-			// delete from local content
-			File backup = new File(String.format("%sbackup_%s%s%s",
-					Util.getContentDirectory(),
-					customerName,
-					File.separator,
-					bean.getSelectedBackupName()));
-			if (backup.exists()) {
-				Util.LOGGER.info("Deleting backup " + backup.getAbsolutePath());
-				FileUtil.delete(backup);
-				Util.LOGGER.info("Deleted backup " + backup.getAbsolutePath());
-			} else {
-				Util.LOGGER.info("Backup " + backup.getAbsolutePath() + " no longer exists");
-			}
+			Util.LOGGER.info("Backup " + backup.getAbsolutePath() + " no longer exists");
 		}
 
 		// deselect the deleted backup

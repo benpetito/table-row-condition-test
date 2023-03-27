@@ -3,7 +3,7 @@ package util;
 import org.junit.After;
 import org.junit.Before;
 import org.skyve.CORE;
-import org.skyve.cache.CacheUtil;
+import org.skyve.EXT;
 import org.skyve.impl.persistence.AbstractPersistence;
 import org.skyve.persistence.Persistence;
 
@@ -18,14 +18,12 @@ import org.skyve.persistence.Persistence;
  * An example of when to extend this base class is if the code under test is
  * performing its own commits, which will not be able to be rolled back.
  */
-public class AbstractH2TestDispose extends AbstractH2Test {
+public abstract class AbstractH2TestDispose extends AbstractH2Test {
 
 	@Before
 	@SuppressWarnings("static-method")
 	public void before() throws Exception {
-		if (CacheUtil.isUnInitialised()) {
-			CacheUtil.init();
-		}
+		EXT.getCaching().startup();
 	}
 
 	@After

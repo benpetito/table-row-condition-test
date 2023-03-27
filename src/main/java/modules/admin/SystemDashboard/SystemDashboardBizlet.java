@@ -1,18 +1,17 @@
 package modules.admin.SystemDashboard;
 
-import org.skyve.cache.StateUtil;
+import org.skyve.impl.cache.StateUtil;
 import org.skyve.impl.util.UtilImpl;
 import org.skyve.metadata.model.document.Bizlet;
 import org.skyve.util.Util;
 
 import modules.admin.Configuration.ConfigurationExtension;
+import modules.admin.Configuration.DiskSpaceSummary;
 import modules.admin.domain.Configuration;
 import modules.admin.domain.Generic;
 import modules.admin.domain.SystemDashboard;
 
 public class SystemDashboardBizlet extends Bizlet<SystemDashboard> {
-
-	private static final long serialVersionUID = -4784606165710946704L;
 
 	@Override
 	public SystemDashboard newInstance(SystemDashboard bean) throws Exception {
@@ -65,9 +64,28 @@ public class SystemDashboardBizlet extends Bizlet<SystemDashboard> {
 				: formatStringValueHTML(valDisabled,
 						Util.i18n("admin.systemDashboard.status.itemLabel.selfRegistrationConfigured.suggestion")));
 		bean.getStatus().add(schedulerEnabled);
+		
+		// available disk space alarm enabled
+		Generic availableDiskSpaceAlarmScheduled = Generic.newInstance();
+		availableDiskSpaceAlarmScheduled.setMemo1(formatLabelHTML(Util.i18n("admin.systemDashboard.status.itemLabel.availableDiskSpaceAlarmScheduled")));
+		if (jobScheduler) {
+			availableDiskSpaceAlarmScheduled.setText5001(formatBooleanHTML(ConfigurationExtension.validAvailableDiskSpaceAlarmSchedule(), valTrue, valFalse,
+					Util.i18n("admin.systemDashboard.status.itemLabel.availableDiskSpaceAlarm.suggestion")));
+		} else {
+			availableDiskSpaceAlarmScheduled.setText5001(formatStringValueHTML(valUnavailable,
+					Util.i18n("admin.systemDashboard.status.itemLabel.availableDiskSpaceAlarm.suggestion")));
+		}
+		bean.getStatus().add(availableDiskSpaceAlarmScheduled);
 
-		// self registration activated
 		ConfigurationExtension config = Configuration.newInstance();
+		// current available disk space 
+		Generic availableDiskSpace = Generic.newInstance();
+		DiskSpaceSummary diskSpaceSummary = new DiskSpaceSummary();
+		availableDiskSpace.setMemo1(formatLabelHTML(Util.i18n("admin.systemDashboard.status.itemLabel.availableDiskSpaceMB")));
+		availableDiskSpace.setText5001(formatStringValueHTML(Long.toString(diskSpaceSummary.getTotalAvailable()), ""));
+		bean.getStatus().add(availableDiskSpace);
+		
+		// self registration activated
 		Generic selfRegConfigured = Generic.newInstance();
 		selfRegConfigured.setMemo1(formatLabelHTML(Util.i18n("admin.systemDashboard.status.itemLabel.selfRegistrationConfigured")));
 		selfRegConfigured.setText5001((config.validSelfRegistration() ? formatBooleanHTML(true, valTrue, valFalse, "")

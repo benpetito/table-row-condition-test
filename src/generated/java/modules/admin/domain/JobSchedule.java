@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import modules.admin.JobSchedule.JobScheduleExtension;
 import modules.admin.UserProxy.UserProxyExtension;
 import org.skyve.CORE;
 import org.skyve.domain.messages.DomainException;
@@ -21,7 +22,7 @@ import org.skyve.impl.domain.types.jaxb.DateTimeMapper;
  */
 @XmlType
 @XmlRootElement
-public class JobSchedule extends AbstractPersistentBean {
+public abstract class JobSchedule extends AbstractPersistentBean {
 	/**
 	 * For Serialization
 	 * @hidden
@@ -471,6 +472,9 @@ public class JobSchedule extends AbstractPersistentBean {
 
 	/** @hidden */
 	public static final String disabledPropertyName = "disabled";
+
+	/** @hidden */
+	public static final String scheduleStringPropertyName = "scheduleString";
 
 	/**
 	 * Job To Run
@@ -1212,6 +1216,11 @@ public class JobSchedule extends AbstractPersistentBean {
 	 **/
 	private Boolean disabled = Boolean.valueOf(false);
 
+	/**
+	 * Schedule
+	 **/
+	private String scheduleString;
+
 	@Override
 	@XmlTransient
 	public String getBizModule() {
@@ -1224,7 +1233,7 @@ public class JobSchedule extends AbstractPersistentBean {
 		return JobSchedule.DOCUMENT_NAME;
 	}
 
-	public static JobSchedule newInstance() {
+	public static JobScheduleExtension newInstance() {
 		try {
 			return CORE.getUser().getCustomer().getModule(MODULE_NAME).getDocument(CORE.getUser().getCustomer(), DOCUMENT_NAME).newInstance(CORE.getUser());
 		}
@@ -3883,6 +3892,24 @@ return modules.admin.JobSchedule.JobScheduleBizlet.getBizKey(this);
 	}
 
 	/**
+	 * {@link #scheduleString} accessor.
+	 * @return	The value.
+	 **/
+	public String getScheduleString() {
+		return scheduleString;
+	}
+
+	/**
+	 * {@link #scheduleString} mutator.
+	 * @param scheduleString	The new value.
+	 **/
+	@XmlElement
+	public void setScheduleString(String scheduleString) {
+		preset(scheduleStringPropertyName, scheduleString);
+		this.scheduleString = scheduleString;
+	}
+
+	/**
 	 * Whether this instance is configured to run schedule jobs
 	 *
 	 * @return The condition
@@ -3918,5 +3945,100 @@ return modules.admin.JobSchedule.JobScheduleBizlet.getBizKey(this);
 	 */
 	public boolean isNotScheduledImmediately() {
 		return (! isScheduledImmediately());
+	}
+
+	/**
+	 * True when Selected Days.
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isSelectedDays() {
+		return ("X".equals(getAllDays()));
+	}
+
+	/**
+	 * {@link #isSelectedDays} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotSelectedDays() {
+		return (! isSelectedDays());
+	}
+
+	/**
+	 * True when Selected Hours.
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isSelectedHours() {
+		return ("X".equals(getAllHours()));
+	}
+
+	/**
+	 * {@link #isSelectedHours} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotSelectedHours() {
+		return (! isSelectedHours());
+	}
+
+	/**
+	 * True when Selected Minutes.
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isSelectedMinutes() {
+		return ("X".equals(getAllMinutes()));
+	}
+
+	/**
+	 * {@link #isSelectedMinutes} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotSelectedMinutes() {
+		return (! isSelectedMinutes());
+	}
+
+	/**
+	 * True when Selected Months.
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isSelectedMonths() {
+		return ("X".equals(getAllMonths()));
+	}
+
+	/**
+	 * {@link #isSelectedMonths} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotSelectedMonths() {
+		return (! isSelectedMonths());
+	}
+
+	/**
+	 * True when Selected Weekdays.
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isSelectedWeekdays() {
+		return ("X".equals(getAllWeekdays()));
+	}
+
+	/**
+	 * {@link #isSelectedWeekdays} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotSelectedWeekdays() {
+		return (! isSelectedWeekdays());
 	}
 }

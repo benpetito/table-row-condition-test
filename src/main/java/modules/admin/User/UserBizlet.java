@@ -34,8 +34,6 @@ import modules.admin.domain.User.WizardState;
 import modules.admin.domain.UserProxy;
 
 public class UserBizlet extends Bizlet<UserExtension> {
-	private static final long serialVersionUID = 5947293714061984815L;
-
 	/**
 	 * Populate the data group association if required.
 	 */
@@ -329,7 +327,7 @@ public class UserBizlet extends Bizlet<UserExtension> {
 	}
 
 	public static void validateGroups(User user, ValidationException e) {
-		if (user.getRoles().isEmpty() && user.getGroups().isEmpty()) {
+		if (!Boolean.TRUE.equals(user.getInactive()) && user.getRoles().isEmpty() && user.getGroups().isEmpty()) {
 			e.getMessages().add(new Message("At least 1 role or group is required to enable correct login for this user."));
 		}
 	}

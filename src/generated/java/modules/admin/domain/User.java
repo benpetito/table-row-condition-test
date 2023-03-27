@@ -21,6 +21,7 @@ import org.skyve.impl.domain.ChangeTrackingArrayList;
 import org.skyve.impl.domain.types.jaxb.DateTimeMapper;
 import org.skyve.impl.domain.types.jaxb.TimestampMapper;
 import org.skyve.metadata.model.document.Bizlet.DomainValue;
+import org.skyve.util.Util;
 
 /**
  * User
@@ -38,7 +39,7 @@ import org.skyve.metadata.model.document.Bizlet.DomainValue;
  */
 @XmlType
 @XmlRootElement
-public abstract class User extends AbstractPersistentBean {
+public abstract class User extends AbstractPersistentBean implements org.skyve.domain.app.admin.User {
 	/**
 	 * For Serialization
 	 * @hidden
@@ -147,6 +148,15 @@ public abstract class User extends AbstractPersistentBean {
 	/** @hidden */
 	public static final String activateUrlPropertyName = "activateUrl";
 
+	/** @hidden */
+	public static final String twoFactorCodePropertyName = "twoFactorCode";
+
+	/** @hidden */
+	public static final String twoFactorCodeGeneratedTimestampPropertyName = "twoFactorCodeGeneratedTimestamp";
+
+	/** @hidden */
+	public static final String twoFactorTokenPropertyName = "twoFactorToken";
+
 	/**
 	 * Wizard State
 	 * <br/>
@@ -185,8 +195,8 @@ public abstract class User extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -207,11 +217,11 @@ public abstract class User extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static WizardState fromDescription(String description) {
+		public static WizardState fromLocalisedDescription(String description) {
 			WizardState result = null;
 
 			for (WizardState value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -262,8 +272,8 @@ public abstract class User extends AbstractPersistentBean {
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -284,11 +294,11 @@ public abstract class User extends AbstractPersistentBean {
 			return result;
 		}
 
-		public static GroupSelection fromDescription(String description) {
+		public static GroupSelection fromLocalisedDescription(String description) {
 			GroupSelection result = null;
 
 			for (GroupSelection value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
@@ -341,7 +351,7 @@ public abstract class User extends AbstractPersistentBean {
 	/**
 	 * Home Module
 	 * <br/>
-	 * The module displayed when the user first logs in.
+	 * The module displayed when the user first signs in.
 	 **/
 	private String homeModule;
 
@@ -540,6 +550,27 @@ which are implied from the groups to which they belong.
 	 * Activation Url
 	 **/
 	private String activateUrl;
+
+	/**
+	 * Two Factor Code
+	 * <br/>
+	 * this is hashed
+	 **/
+	private String twoFactorCode;
+
+	/**
+	 * 2FA Code DateTime
+	 * <br/>
+	 * used to invalidate the 2fa code when X amount of time has passed. Not displayed to the user
+	 **/
+	private Timestamp twoFactorCodeGeneratedTimestamp;
+
+	/**
+	 * Two Factor Token
+	 * <br/>
+	 * Used to identify the user is in the same session for 2FA code entry, this is for the system
+	 **/
+	private String twoFactorToken;
 
 	@Override
 	@XmlTransient
@@ -966,7 +997,9 @@ return modules.admin.User.UserBizlet.bizKey(this);
 	 **/
 	public boolean addRolesElement(UserRole element) {
 		boolean result = roles.add(element);
-		element.setParent((UserExtension) this);
+		if (result) {
+			element.setParent((UserExtension) this);
+		}
 		return result;
 	}
 
@@ -986,7 +1019,9 @@ return modules.admin.User.UserBizlet.bizKey(this);
 	 **/
 	public boolean removeRolesElement(UserRole element) {
 		boolean result = roles.remove(element);
-		element.setParent(null);
+		if (result) {
+			element.setParent(null);
+		}
 		return result;
 	}
 
@@ -1087,7 +1122,9 @@ return modules.admin.User.UserBizlet.bizKey(this);
 	 **/
 	public boolean addCandidateContactsElement(UserCandidateContact element) {
 		boolean result = candidateContacts.add(element);
-		element.setParent((UserExtension) this);
+		if (result) {
+			element.setParent((UserExtension) this);
+		}
 		return result;
 	}
 
@@ -1107,7 +1144,9 @@ return modules.admin.User.UserBizlet.bizKey(this);
 	 **/
 	public boolean removeCandidateContactsElement(UserCandidateContact element) {
 		boolean result = candidateContacts.remove(element);
-		element.setParent(null);
+		if (result) {
+			element.setParent(null);
+		}
 		return result;
 	}
 
@@ -1344,6 +1383,81 @@ return modules.admin.User.UserBizlet.bizKey(this);
 	}
 
 	/**
+	 * {@link #twoFactorCode} accessor.
+	 * @return	The value.
+	 **/
+	public String getTwoFactorCode() {
+		return twoFactorCode;
+	}
+
+	/**
+	 * {@link #twoFactorCode} mutator.
+	 * @param twoFactorCode	The new value.
+	 **/
+	@XmlElement
+	public void setTwoFactorCode(String twoFactorCode) {
+		preset(twoFactorCodePropertyName, twoFactorCode);
+		this.twoFactorCode = twoFactorCode;
+	}
+
+	/**
+	 * {@link #twoFactorCodeGeneratedTimestamp} accessor.
+	 * @return	The value.
+	 **/
+	public Timestamp getTwoFactorCodeGeneratedTimestamp() {
+		return twoFactorCodeGeneratedTimestamp;
+	}
+
+	/**
+	 * {@link #twoFactorCodeGeneratedTimestamp} mutator.
+	 * @param twoFactorCodeGeneratedTimestamp	The new value.
+	 **/
+	@XmlElement
+	@XmlSchemaType(name = "dateTime")
+	@XmlJavaTypeAdapter(TimestampMapper.class)
+	public void setTwoFactorCodeGeneratedTimestamp(Timestamp twoFactorCodeGeneratedTimestamp) {
+		preset(twoFactorCodeGeneratedTimestampPropertyName, twoFactorCodeGeneratedTimestamp);
+		this.twoFactorCodeGeneratedTimestamp = twoFactorCodeGeneratedTimestamp;
+	}
+
+	/**
+	 * {@link #twoFactorToken} accessor.
+	 * @return	The value.
+	 **/
+	public String getTwoFactorToken() {
+		return twoFactorToken;
+	}
+
+	/**
+	 * {@link #twoFactorToken} mutator.
+	 * @param twoFactorToken	The new value.
+	 **/
+	@XmlElement
+	public void setTwoFactorToken(String twoFactorToken) {
+		preset(twoFactorTokenPropertyName, twoFactorToken);
+		this.twoFactorToken = twoFactorToken;
+	}
+
+	/**
+	 * Whether the current user is allowed to manage this user's details
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isAccessDenied() {
+		return (!isOwningUser() && !isSecurityAdministrator());
+	}
+
+	/**
+	 * {@link #isAccessDenied} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotAccessDenied() {
+		return (! isAccessDenied());
+	}
+
+	/**
 	 * Allows administrators to manually activate users when User Self-Registration is enabled.
 	 *
 	 * @return The condition
@@ -1517,6 +1631,25 @@ return modules.admin.User.UserBizlet.bizKey(this);
 	}
 
 	/**
+	 * Whether the current user is this user
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isOwningUser() {
+		return (((UserExtension) this).owningUser());
+	}
+
+	/**
+	 * {@link #isOwningUser} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotOwningUser() {
+		return (! isOwningUser());
+	}
+
+	/**
 	 * Security Administrator
 	 *
 	 * @return The condition
@@ -1561,7 +1694,7 @@ return modules.admin.User.UserBizlet.bizKey(this);
 	 */
 	@XmlTransient
 	public boolean isSelfRegistrationEnabledAndUserNotActivated() {
-		return (org.skyve.impl.util.UtilImpl.ACCOUNT_ALLOW_SELF_REGISTRATION && Boolean.FALSE.equals(getActivated()));
+		return (isSelfRegistrationEnabled() && Boolean.FALSE.equals(getActivated()) && isSecurityAdministrator());
 	}
 
 	/**

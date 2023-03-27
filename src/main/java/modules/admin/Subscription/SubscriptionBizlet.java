@@ -4,70 +4,22 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.UUID;
 
+import org.skyve.domain.Bean;
+import org.skyve.domain.PersistentBean;
+import org.skyve.domain.messages.DomainException;
+import org.skyve.domain.types.OptimisticLock;
+import org.skyve.metadata.model.document.Bizlet;
+import org.skyve.persistence.Persistence;
+import org.skyve.persistence.SQL;
+
 import modules.admin.domain.Contact;
 import modules.admin.domain.Contact.ContactType;
 import modules.admin.domain.Subscription;
 
-import org.skyve.CORE;
-import org.skyve.domain.Bean;
-import org.skyve.domain.PersistentBean;
-import org.skyve.domain.messages.DomainException;
-import org.skyve.domain.messages.Message;
-import org.skyve.domain.messages.ValidationException;
-import org.skyve.domain.types.OptimisticLock;
-import org.skyve.metadata.customer.Customer;
-import org.skyve.metadata.model.document.Bizlet;
-import org.skyve.metadata.model.document.Document;
-import org.skyve.metadata.module.Module;
-import org.skyve.metadata.user.User;
-import org.skyve.persistence.Persistence;
-import org.skyve.persistence.SQL;
-
 public class SubscriptionBizlet extends Bizlet<Subscription> {
 
-	private static final long serialVersionUID = -8006732196635189574L;
-
 	private static final String SUBSCRIPTION_PUBLIC_USERNAME = "SkyveSubscriptionUser";
-
 	private static final String SUBSCRIPTION_PUBLIC_USER_ID = "SkyveSubscriptionUser";
-
-	/**
-	 * Validation for Subscription
-	 * 
-	 * If the subscription is declined, the format type is not required. If the
-	 * format type is supplied, then the communication is only declined for that
-	 * format.
-	 * 
-	 * If the subscription is not declined, the format type is required, as this
-	 * specifies the format preference for the communication.
-	 * 
-	 * If the subscription is not declined and has no formatType, the
-	 * subscription can be deleted as it holds no value.
-	 * 
-	 */
-	@Override
-	public void validate(Subscription bean, ValidationException e) throws Exception {
-
-		// get correct nomenclature for the user
-		Persistence pers = CORE.getPersistence();
-		User user = pers.getUser();
-		Customer customer = user.getCustomer();
-		Module module = customer.getModule(Subscription.MODULE_NAME);
-		Document document = module.getDocument(customer, Subscription.DOCUMENT_NAME);
-
-		if (!Boolean.TRUE.equals(bean.getDeclined())) {
-			if (bean.getFormatType() == null) {
-				StringBuilder msg = new StringBuilder(128);
-				msg.append("A ").append(document.getLocalisedSingularAlias());
-				msg.append(" requires a ").append(document.getAttribute(Subscription.formatTypePropertyName).getLocalisedDisplayName());
-				msg.append(" unless the ").append(document.getLocalisedSingularAlias());
-				msg.append(" has ").append(document.getAttribute(Subscription.declinedPropertyName).getLocalisedDisplayName()).append(" set.");
-				e.getMessages().add(new Message(Subscription.formatTypePropertyName, msg.toString()));
-			}
-		}
-
-		super.validate(bean, e);
-	}
 
 	/**
 	 * anonymouslyUnsubscribe creates a declined subscription for an anonymous request

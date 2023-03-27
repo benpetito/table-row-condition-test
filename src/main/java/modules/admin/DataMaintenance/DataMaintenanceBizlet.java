@@ -21,8 +21,6 @@ import modules.admin.domain.DataMaintenance.RestorePreProcess;
 import modules.admin.domain.ModuleDocument;
 
 public class DataMaintenanceBizlet extends SingletonCachedBizlet<DataMaintenance> {
-	private static final long serialVersionUID = -2754093263194272489L;
-
 	public static final String SYSTEM_DATA_REFRESH_NOTIFICATION = "SYSTEM Document Data Refresh Notification";
 	public static final String SYSTEM_DATA_REFRESH_DEFAULT_SUBJECT = "Perform Document Data Refresh - Complete";
 	public static final String SYSTEM_DATA_REFRESH_DEFAULT_BODY = "The document data refresh is complete." + JobsBizlet.SYSTEM_JOB_NOTIFICATION_LINK_TO_JOBS;
@@ -35,7 +33,7 @@ public class DataMaintenanceBizlet extends SingletonCachedBizlet<DataMaintenance
 		for (Module m : c.getModules()) {
 			for (String k : m.getDocumentRefs().keySet()) {
 				Document d = m.getDocument(c, k);
-				if (d.getPersistent() != null) {
+				if (d.isPersistable()) {
 					ModuleDocument doc = ModuleDocument.newInstance();
 					doc.setModuleName(m.getName());
 					doc.setDocumentName(d.getName());
@@ -58,7 +56,7 @@ public class DataMaintenanceBizlet extends SingletonCachedBizlet<DataMaintenance
 			for (Module m : c.getModules()) {
 				for (String k : m.getDocumentRefs().keySet()) {
 					Document d = m.getDocument(c, k);
-					if (d.getPersistent() != null) {
+					if (d.isPersistable()) {
 						result.add(new DomainValue(String.format("%s.%s", m.getName(), k), 
 													String.format("%s.%s", m.getLocalisedTitle(), d.getLocalisedSingularAlias())));
 					}
@@ -144,7 +142,7 @@ public class DataMaintenanceBizlet extends SingletonCachedBizlet<DataMaintenance
 			Module m = c.getModule(bean.getAuditModuleName());
 			for (String k : m.getDocumentRefs().keySet()) {
 				Document d = m.getDocument(c, k);
-				if (d.getPersistent() != null) {
+				if (d.isPersistable()) {
 					result.add(new DomainValue(d.getName(), d.getLocalisedSingularAlias()));
 				}
 			}

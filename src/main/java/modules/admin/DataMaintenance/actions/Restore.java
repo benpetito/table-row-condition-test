@@ -21,7 +21,6 @@ import org.skyve.web.WebContext;
 import modules.admin.domain.DataMaintenance;
 
 public class Restore implements ServerSideAction<DataMaintenance> {
-	private static final long serialVersionUID = 8521252561712649481L;
 	private static final String J_RESTORE = "jRestore";
 
 	@Override
@@ -34,15 +33,14 @@ public class Restore implements ServerSideAction<DataMaintenance> {
 		
 		boolean restoreAlreadyRunning = false;
 		try {
-			List<JobDescription> runningJobs = EXT.getCustomerRunningJobs();
+			List<JobDescription> runningJobs = EXT.getJobScheduler().getCustomerRunningJobs();
 			for (JobDescription jd : runningJobs) {
 				if (job.getDisplayName().equals(jd.getName())) {
 					restoreAlreadyRunning = true;
 					break;
 				}
 			}
-		} catch (Exception e) {
-			
+		} catch (@SuppressWarnings("unused") Exception e) {
 			throw new ValidationException(new Message(Util.i18n("admin.dataMaintenance.actions.restore.cannotDetectRunningJobsException")));
 		}
 
@@ -50,14 +48,30 @@ public class Restore implements ServerSideAction<DataMaintenance> {
 			throw new ValidationException(new Message(Util.i18n("admin.dataMaintenance.actions.restore.jobAlreadyRunningException")));
 		}
 		
+		if(bean.getContentRestoreOption()==null) {
+			Document d = m.getDocument(c, DataMaintenance.DOCUMENT_NAME);
+			@SuppressWarnings("null")
+			String desc = d.getAttribute(DataMaintenance.contentRestoreOptionPropertyName).getLocalisedDisplayName();
+			String msg = Util.i18n("admin.dataMaintenance.actions.restore.selectContentRestoreOptionException", desc);
+			throw new ValidationException(DataMaintenance.contentRestoreOptionPropertyName, msg);
+		}
+		if(bean.getRestoreIndexingOption()==null) {
+			Document d = m.getDocument(c, DataMaintenance.DOCUMENT_NAME);
+			@SuppressWarnings("null")
+			String desc = d.getAttribute(DataMaintenance.restoreIndexingOptionPropertyName).getLocalisedDisplayName();
+			String msg = Util.i18n("admin.dataMaintenance.actions.restore.selectRestoreIndexingOptionException", desc); 
+			throw new ValidationException(DataMaintenance.restoreIndexingOptionPropertyName, msg);
+		}
+		
 		if (bean.getRestorePreProcess() == null) {
 			Document d = m.getDocument(c, DataMaintenance.DOCUMENT_NAME);
-			String msg = Util.i18n("admin.dataMaintenance.actions.restore.selectPreProcessException"
-					, d.getAttribute(DataMaintenance.restorePreProcessPropertyName).getLocalisedDisplayName()); 
+			@SuppressWarnings("null")
+			String desc = d.getAttribute(DataMaintenance.restorePreProcessPropertyName).getLocalisedDisplayName();
+			String msg = Util.i18n("admin.dataMaintenance.actions.restore.selectPreProcessException", desc); 
 			throw new ValidationException(new Message(DataMaintenance.restorePreProcessPropertyName, msg));
 		}
 		
-		EXT.runOneShotJob(job, bean, u);
+		EXT.getJobScheduler().runOneShotJob(job, bean, u);
 		webContext.growl(MessageSeverity.info, Util.i18n("admin.dataMaintenance.actions.restore.restoreJobCommenced"));
 
 		return new ServerSideActionResult<>(bean);

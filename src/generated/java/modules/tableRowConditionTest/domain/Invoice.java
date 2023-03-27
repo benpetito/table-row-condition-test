@@ -166,7 +166,9 @@ public class Invoice extends AbstractPersistentBean {
 	 **/
 	public boolean addItemsElement(InvoiceItemExtension element) {
 		boolean result = items.add(element);
-		element.setParent(this);
+		if (result) {
+			element.setParent(this);
+		}
 		return result;
 	}
 
@@ -186,7 +188,9 @@ public class Invoice extends AbstractPersistentBean {
 	 **/
 	public boolean removeItemsElement(InvoiceItemExtension element) {
 		boolean result = items.remove(element);
-		element.setParent(null);
+		if (result) {
+			element.setParent(null);
+		}
 		return result;
 	}
 

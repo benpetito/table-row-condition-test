@@ -8,12 +8,6 @@ import org.skyve.metadata.model.document.Bizlet;
 import org.skyve.web.WebContext;
 
 public class SelfRegistrationActivationBizlet extends Bizlet<SelfRegistrationActivationExtension> {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 142089849010035272L;
-
 	@Override
 	public SelfRegistrationActivationExtension preExecute(ImplicitActionName actionName, SelfRegistrationActivationExtension bean, Bean parentBean, WebContext webContext)
 			throws Exception {
@@ -21,9 +15,8 @@ public class SelfRegistrationActivationBizlet extends Bizlet<SelfRegistrationAct
 			HttpServletRequest request = (HttpServletRequest) webContext.getHttpServletRequest();
 			String activationCode = request.getParameter("code");
 
-			bean.activateUser(activationCode);
+			bean.setUser(bean.activateUser(activationCode));
 		}
 		return bean;
 	}
-
 }

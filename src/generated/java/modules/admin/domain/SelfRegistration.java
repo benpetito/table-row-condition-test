@@ -39,6 +39,9 @@ public abstract class SelfRegistration extends AbstractTransientBean {
 	public static final String activateUrlPropertyName = "activateUrl";
 
 	/** @hidden */
+	public static final String confirmEmailPropertyName = "confirmEmail";
+
+	/** @hidden */
 	public static final String confirmPasswordPropertyName = "confirmPassword";
 
 	/** @hidden */
@@ -59,6 +62,11 @@ public abstract class SelfRegistration extends AbstractTransientBean {
 	private String activateUrl;
 
 	/**
+	 * Confirm Email
+	 **/
+	private String confirmEmail;
+
+	/**
 	 * Confirm Password
 	 * <br/>
 	 * Confirm password checked during user registration to bypass change password
@@ -67,12 +75,12 @@ public abstract class SelfRegistration extends AbstractTransientBean {
 	private String confirmPassword;
 
 	/**
-	 * Login Url
+	 * Sign In URL
 	 **/
 	private String loginUrl;
 
 	/**
-	 * Login Message
+	 * Sign In Message
 	 * <br/>
 	 * Transient field to allow login message to be overridden
 	 **/
@@ -148,6 +156,24 @@ public abstract class SelfRegistration extends AbstractTransientBean {
 	@XmlElement
 	public void setActivateUrl(String activateUrl) {
 		this.activateUrl = activateUrl;
+	}
+
+	/**
+	 * {@link #confirmEmail} accessor.
+	 * @return	The value.
+	 **/
+	public String getConfirmEmail() {
+		return confirmEmail;
+	}
+
+	/**
+	 * {@link #confirmEmail} mutator.
+	 * @param confirmEmail	The new value.
+	 **/
+	@XmlElement
+	public void setConfirmEmail(String confirmEmail) {
+		preset(confirmEmailPropertyName, confirmEmail);
+		this.confirmEmail = confirmEmail;
 	}
 
 	/**
@@ -240,6 +266,44 @@ public abstract class SelfRegistration extends AbstractTransientBean {
 			preset(userPropertyName, user);
 			this.user = user;
 		}
+	}
+
+	/**
+	 * True if the entered confirm email address is invalid (does not conform to the regular expression).
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isConfirmEmailInvalid() {
+		return (((SelfRegistrationExtension)this).confirmEmailInvalid());
+	}
+
+	/**
+	 * {@link #isConfirmEmailInvalid} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotConfirmEmailInvalid() {
+		return (! isConfirmEmailInvalid());
+	}
+
+	/**
+	 * True if the entered email address is invalid (does not conform to the regular expression).
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isEmailInvalid() {
+		return (((SelfRegistrationExtension)this).emailInvalid());
+	}
+
+	/**
+	 * {@link #isEmailInvalid} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotEmailInvalid() {
+		return (! isEmailInvalid());
 	}
 
 	/**

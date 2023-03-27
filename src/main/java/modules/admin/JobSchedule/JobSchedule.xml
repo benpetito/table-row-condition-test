@@ -475,6 +475,11 @@
 			<displayName>admin.jobSchedule.disabled.displayName</displayName>
 			<defaultValue>false</defaultValue>
 		</boolean>
+		
+		<!-- transient fields -->
+		<memo name="scheduleString" persistent="false">
+			<displayName>Schedule</displayName>
+		</memo>
 	</attributes>
 	<conditions>
 		<condition name="scheduledImmediately">
@@ -489,6 +494,26 @@
 					org.skyve.impl.util.UtilImpl.JOB_SCHEDULER
 				]]>
 			</expression>
+		</condition>
+		<condition name="selectedMinutes" usage="view">
+			<description>True when Selected Minutes.</description>
+			<expression>"X".equals(getAllMinutes())</expression>
+		</condition>
+		<condition name="selectedHours" usage="view">
+			<description>True when Selected Hours.</description>
+			<expression>"X".equals(getAllHours())</expression>
+		</condition>
+		<condition name="selectedDays" usage="view">
+			<description>True when Selected Days.</description>
+			<expression>"X".equals(getAllDays())</expression>
+		</condition>
+		<condition name="selectedMonths" usage="view">
+			<description>True when Selected Months.</description>
+			<expression>"X".equals(getAllMonths())</expression>
+		</condition>
+		<condition name="selectedWeekdays" usage="view">
+			<description>True when Selected Weekdays.</description>
+			<expression>"X".equals(getAllWeekdays())</expression>
 		</condition>
 	</conditions>
 </document>

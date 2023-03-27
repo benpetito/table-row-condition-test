@@ -3,7 +3,6 @@ package modules.admin;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
-import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
@@ -35,19 +34,18 @@ import org.skyve.metadata.module.Module;
 import org.skyve.metadata.user.User;
 import org.skyve.persistence.AutoClosingIterable;
 import org.skyve.persistence.DocumentQuery;
-import org.skyve.persistence.DocumentQuery.AggregateFunction;
 import org.skyve.persistence.Persistence;
 import org.skyve.util.Binder;
+import org.skyve.util.CommunicationUtil;
 import org.skyve.util.Time;
 
-import modules.admin.Communication.CommunicationUtil;
 import modules.admin.Group.GroupExtension;
 import modules.admin.User.UserExtension;
 import modules.admin.UserList.UserListUtil;
 import modules.admin.UserProxy.UserProxyExtension;
 import modules.admin.domain.Contact;
-import modules.admin.domain.DocumentNumber;
 import modules.admin.domain.Group;
+import modules.admin.domain.GroupRole;
 import modules.admin.domain.UserProxy;
 
 /**
@@ -59,6 +57,8 @@ import modules.admin.domain.UserProxy;
  *
  */
 public class ModulesUtil {
+
+	public static final long MEGABYTE = 1024L * 1024L;
 
 	/** comparator to allow sorting of domain values by code */
 	public static class DomainValueSortByCode implements Comparator<DomainValue> {
@@ -72,7 +72,7 @@ public class ModulesUtil {
 	public static class DomainValueSortByDescription implements Comparator<DomainValue> {
 		@Override
 		public int compare(DomainValue d1, DomainValue d2) {
-			return d1.getDescription().compareTo(d2.getDescription());
+			return d1.getLocalisedDescription().compareTo(d2.getLocalisedDescription());
 		}
 	}
 
@@ -603,7 +603,7 @@ public class ModulesUtil {
 		q.getFilter().addEquals(modules.admin.domain.User.userNamePropertyName, contact.getEmail1());
 		q.setMaxResults(1);
 
-		User found = q.beanResult();
+		UserExtension found = q.beanResult();
 		if (found != null) {
 			throw new DomainException("admin.modulesUtils.createAdminUserFromContactWithGroup.exception.duplicateUser");
 		}
@@ -622,17 +622,17 @@ public class ModulesUtil {
 		CORE.getCustomer().getModule(homeModuleName);
 
 		// save the contact to validate the contact and so that it can be referenced by the user
-		contact = CORE.getPersistence().save(contact);
+		Contact newContact = CORE.getPersistence().save(contact);
 
 		final String token = UUID.randomUUID().toString() + Long.toString(System.currentTimeMillis());
 		// create a user - not with a generated password
 		UserExtension newUser = modules.admin.domain.User.newInstance();
-		newUser.setUserName(contact.getEmail1());
+		newUser.setUserName(newContact.getEmail1());
 		newUser.setPassword(EXT.hashPassword(token));
 		newUser.setPasswordExpired(Boolean.TRUE);
 		newUser.setPasswordResetToken(token);
 		newUser.setHomeModule(homeModuleName);
-		newUser.setContact(contact);
+		newUser.setContact(newContact);
 
 		// assign group
 		newUser.getGroups().add(group);
@@ -648,7 +648,7 @@ public class ModulesUtil {
 																  CommunicationUtil.ResponseMode.EXPLICIT, null, newUser);
 
 			} catch (Exception e) {
-				throw new DomainException("admin.modulesUtils.createAdminUserFromContactWithGroup.exception.invitation");
+				throw new DomainException("admin.modulesUtils.createAdminUserFromContactWithGroup.exception.invitation", e);
 			}
 		}
 		return newUser;
@@ -688,189 +688,6 @@ public class ModulesUtil {
 		Message vM = new Message(messageString);
 		vM.addBinding(fieldName);
 		e.getMessages().add(vM);
-	}
-
-	/**
-	 * Returns a new document/sequence number for the given
-	 * module.document.fieldName in a thread-safe way.
-	 * <p>
-	 * If no previous record is found in the DocumentNumber table, the method
-	 * attempts to find the Maximum existing value currently extant in the field
-	 * and increments that. Otherwise, the value returned is incremented and
-	 * updated DocumentNumber value for the specified combination.
-	 *
-	 * @param prefix
-	 *        - if the sequence value has a known prefix before the number,
-	 *        eg INV0001 has a prefix of "INV"
-	 * @param moduleName
-	 *        - the application module
-	 * @param documentName
-	 *        - the application document
-	 * @param fieldName
-	 *        - the fieldName/columnName in which the value is held
-	 * @param numberLength
-	 *        - the minimum length of the number when specified as a string
-	 * @return - the next sequence number
-	 */
-	public static String getNextDocumentNumber(String prefix, String moduleName, String documentName, String fieldName,
-			int numberLength) {
-
-		Persistence pers = CORE.getPersistence();
-		User user = pers.getUser();
-		Customer customer = user.getCustomer();
-		Module module = customer.getModule(DocumentNumber.MODULE_NAME);
-		Document document = module.getDocument(customer, DocumentNumber.DOCUMENT_NAME);
-
-		String nextNumber = "0";
-		String lastNumber = "0";
-
-		DocumentNumber dN = null;
-		try {
-			DocumentQuery qN = pers.newDocumentQuery(DocumentNumber.MODULE_NAME, DocumentNumber.DOCUMENT_NAME);
-			qN.getFilter().addEquals(DocumentNumber.moduleNamePropertyName, moduleName);
-			qN.getFilter().addEquals(DocumentNumber.documentNamePropertyName, documentName);
-			qN.getFilter().addEquals(DocumentNumber.sequenceNamePropertyName, fieldName);
-
-			List<DocumentNumber> num = qN.beanResults();
-			if (num.isEmpty()) {
-
-				// System.out.println("DOCUMENT NUMBER: No previous found - source from table");
-
-				// Check if sequence name is a field in that table
-				boolean isField = false;
-				for (Attribute attribute : document.getAttributes()) {
-					if (attribute.getName().equals(fieldName)) {
-						isField = true;
-						break;
-					}
-				}
-
-				if (isField) {
-					// first hit - go lookup max number from table
-					DocumentQuery query = pers.newDocumentQuery(moduleName, documentName);
-					query.addAggregateProjection(AggregateFunction.Max, fieldName, "MaxNumber");
-
-					List<Bean> beans = query.projectedResults();
-					if (!beans.isEmpty()) {
-						Object o = Binder.get(beans.get(0), "MaxNumber");
-						if (o instanceof Integer) {
-							lastNumber = ((Integer) Binder.get(beans.get(0), "MaxNumber")).toString();
-						} else {
-							lastNumber = (String) Binder.get(beans.get(0), "MaxNumber");
-						}
-					}
-				}
-
-				// create a new document number record
-				dN = DocumentNumber.newInstance();
-				dN.setModuleName(moduleName);
-				dN.setDocumentName(documentName);
-				dN.setSequenceName(fieldName);
-
-			} else {
-				// System.out.println("DOCUMENT NUMBER: Previous found");
-				dN = num.get(0);
-				dN = pers.retrieveAndLock(document, dN.getBizId()); // issue a row-level lock
-				lastNumber = dN.getDocumentNumber();
-			}
-			// just update from the document Number
-			nextNumber = incrementAlpha(prefix, lastNumber, numberLength);
-			dN.setDocumentNumber(nextNumber);
-
-			pers.preMerge(document, dN);
-			pers.upsertBeanTuple(dN);
-			pers.postMerge(document, dN);
-		} finally {
-			if (dN != null) {
-				pers.evictCached(dN);
-			}
-		}
-		// System.out.println("Next document number for " + moduleName + "." +
-		// documentName + "." + fieldName + " is " + nextNumber);
-
-		return nextNumber;
-	}
-
-	/**
-	 * Wrapper for getNextDocumentNumber, specifically for numeric only
-	 * sequences
-	 */
-	public static Integer getNextDocumentNumber(String moduleName, String documentName, String fieldName) {
-
-		return Integer.valueOf(Integer.parseInt(getNextDocumentNumber(null, moduleName, documentName, fieldName, 0)));
-	}
-
-	/**
-     * Wrapper for getNextDocumentNumber, specifically for long only
-     * sequences
-     */
-    public static Long getNextLongDocumentNumber(String moduleName, String documentName, String fieldName) {
-
-		return Long.valueOf(Long.parseLong(getNextDocumentNumber(null, moduleName, documentName, fieldName, 0)));
-    }
-
-	/**
-	 * Returns the next alpha value - ie A00A1 becomes A00A2 etc
-	 *
-	 * @param suppliedPrefix
-	 *        - if the sequence value has a known prefix before the number,
-	 *        eg INV0001 has a prefix of "INV"
-	 * @param lastNumber
-	 *        - the number to increment
-	 * @param numberLength
-	 *        - the minimum length of the number when specified as a string
-	 *
-	 * @return - the next number
-	 */
-	public static String incrementAlpha(String suppliedPrefix, String lastNumber, int numberLength) {
-
-		String newNumber = "";
-		String nonNumeric = lastNumber;
-		Integer value = Integer.valueOf(1);
-		String prefix;
-		if (suppliedPrefix != null) {
-			prefix = suppliedPrefix;
-		} else {
-			prefix = "";
-		}
-
-		if (lastNumber != null) {
-			String[] parts = (new StringBuilder(" ").append(lastNumber)).toString().split("\\D\\d+$");
-
-			// cater for alpha prefix
-			if (parts.length > 0 && parts[0].length() < lastNumber.length()) {
-				String numberPart = lastNumber.substring(parts[0].length(), lastNumber.length());
-				nonNumeric = lastNumber.substring(0, parts[0].length());
-
-				value = Integer.valueOf(Integer.parseInt(numberPart) + 1);
-
-				// cater for purely numeric prefix
-			} else if (prefix.matches("^\\d+$") && lastNumber.matches("^\\d+$") && !"0".equals(lastNumber)) {
-				int len = prefix.length();
-				value = Integer.valueOf(Integer.parseInt(lastNumber.substring(len)) + 1);
-				nonNumeric = prefix;
-
-				// cater for numeric only
-			} else if (lastNumber.matches("^\\d+$")) {
-				nonNumeric = prefix;
-				value = Integer.valueOf(Integer.parseInt(lastNumber) + 1);
-			}
-		} else {
-			nonNumeric = prefix;
-		}
-
-		// now put prefix and value together
-		int newLength = (nonNumeric.length() + value.toString().length() > numberLength
-				? nonNumeric.length() + value.toString().length() : numberLength);
-
-		StringBuilder sb = new StringBuilder(newLength + 1);
-		try (Formatter f = new Formatter(sb)) {
-			newNumber = nonNumeric
-					+ f.format(new StringBuilder("%1$").append(newLength - nonNumeric.length()).append("s").toString(),
-							value.toString()).toString().replace(" ", "0");
-		}
-
-		return newNumber;
 	}
 
 	private static final long PRIME = 4294967291L;
@@ -994,7 +811,7 @@ public class ModulesUtil {
 					Module module = customer.getModule(b.getBizModule());
 					Document document = module.getDocument(customer, b.getBizDocument());
 
-					for (Attribute attribute : document.getAllAttributes()) {
+					for (Attribute attribute : document.getAllAttributes(customer)) {
 						if (attribute.getLocalisedDisplayName().equals(a)) {
 							found = true;
 							if (binding.toString().length() > 0) {
@@ -1163,7 +980,7 @@ public class ModulesUtil {
 			Document document = module.getDocument(customer, bean.getBizDocument());
 
 			try {
-				persistence.preMerge(document, bean);
+				persistence.preMerge(document, (PersistentBean) bean);
 			} catch (DomainException e) {
 				loader.addError(customer, bean, e);
 			}
@@ -1213,7 +1030,7 @@ public class ModulesUtil {
 		Module module = customer.getModule(moduleName);
 		Document document = module.getDocument(customer, documentName);
 		Persistent p = document.getPersistent();
-		return p.getPersistentIdentifier();
+		return (p == null) ? null : p.getPersistentIdentifier();
 	}
 
 	/**
@@ -1232,7 +1049,51 @@ public class ModulesUtil {
 			q.getFilter().addLike(attributeName, value + "%");
 		}
 		q.addBoundProjection(attributeName, attributeName);
+		q.addBoundOrdering(attributeName);
 		q.setDistinct(true);
 		return q.scalarResults(String.class);
 	}
+
+	/**
+	 * Configure a permissions group with at least the roleNames specified
+	 * 
+	 * @param name
+	 * @param roleNames
+	 */
+	public static GroupExtension configureGroup(String name, String... roleNames) {
+		// Configure required Staff permissions group
+		DocumentQuery qGroup = CORE.getPersistence().newDocumentQuery(Group.MODULE_NAME, Group.DOCUMENT_NAME);
+		qGroup.getFilter().addEquals(Group.namePropertyName, name);
+		boolean saveRequired = false;
+		GroupExtension g = qGroup.beanResult();
+		if (g == null) {
+			g = Group.newInstance();
+			g.setName(name);
+			saveRequired = true;
+		}
+		// check roles
+		for (String s : roleNames) {
+			boolean found = false;
+			for (GroupRole gr : g.getRoles()) {
+				if (s.equals(gr.getRoleName())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				GroupRole gr = GroupRole.newInstance();
+				gr.setRoleName(s);
+				g.addRolesElement(gr);
+				saveRequired = true;
+			}
+		}
+
+		// and Save the group
+		if (saveRequired) {
+			g = CORE.getPersistence().save(g);
+		}
+
+		return g;
+	}
+
 }

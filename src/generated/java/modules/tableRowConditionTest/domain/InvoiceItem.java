@@ -18,6 +18,7 @@ import org.skyve.domain.types.Enumeration;
 import org.skyve.impl.domain.AbstractPersistentBean;
 import org.skyve.impl.domain.types.jaxb.Decimal2Mapper;
 import org.skyve.metadata.model.document.Bizlet.DomainValue;
+import org.skyve.util.Util;
 
 /**
  * Invoice Item
@@ -84,8 +85,8 @@ public abstract class InvoiceItem extends AbstractPersistentBean implements Chil
 		}
 
 		@Override
-		public String toDescription() {
-			return description;
+		public String toLocalisedDescription() {
+			return Util.i18n(description);
 		}
 
 		@Override
@@ -106,11 +107,11 @@ public abstract class InvoiceItem extends AbstractPersistentBean implements Chil
 			return result;
 		}
 
-		public static Type fromDescription(String description) {
+		public static Type fromLocalisedDescription(String description) {
 			Type result = null;
 
 			for (Type value : values()) {
-				if (value.description.equals(description)) {
+				if (value.toLocalisedDescription().equals(description)) {
 					result = value;
 					break;
 				}
