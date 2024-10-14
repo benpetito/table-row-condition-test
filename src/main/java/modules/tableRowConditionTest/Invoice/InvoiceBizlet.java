@@ -10,8 +10,6 @@ import modules.tableRowConditionTest.domain.InvoiceItem;
 
 public class InvoiceBizlet extends Bizlet<Invoice> {
 
-	private static final long serialVersionUID = -1319186153923191583L;
-
 	@Override
 	public void preRerender(String source, Invoice bean, WebContext webContext) throws Exception {
 		Util.LOGGER.info("InvoiceBizlet:preRererender(" + source + ")");

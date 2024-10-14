@@ -18,7 +18,7 @@
         </row>
     </form>
     <vbox widgetId="formInvoiceItems">
-	    <dataGrid title="Invoice Items" binding="items" inline="true" showAdd="false" showEdit="false" showRemove="false" showZoom="false">
+	    <dataGrid title="Invoice Items" binding="items" inline="true" showAdd="true" showEdit="false" showRemove="true" showZoom="false">
 	        <boundColumn binding="item"/>
 	        <boundColumn binding="amount"/>
 	        <boundColumn binding="quantity">
