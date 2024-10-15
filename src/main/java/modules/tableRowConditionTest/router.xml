@@ -2,6 +2,12 @@
 <router xmlns="http://www.skyve.org/xml/router"
 			xsi:schemaLocation="http://www.skyve.org/xml/router ../../schemas/router.xsd"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<uxui name="tablet">
+		<!-- use a custom route for the page holding the data grid so we can specify a custom.xhtml -->
+		<route outcome="/test/invoice.xhtml">
+			<criteria webAction="e" module="tableRowConditionTest" document="Invoice"/>
+		</route>
+	</uxui>
 	<uxui name="external">
 		<!-- use a custom route for the page holding the data grid so we can specify a custom.xhtml -->
 		<route outcome="/test/invoice.xhtml">

@@ -27,6 +27,7 @@
                 <value code="Hours"/>
             </values>
         </enum>
+        
     </attributes>
     <conditions>
     	<condition name="canChange" usage="view">

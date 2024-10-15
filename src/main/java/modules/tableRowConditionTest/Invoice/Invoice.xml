@@ -18,5 +18,9 @@
             <minCardinality>0</minCardinality>
             <ordering/>
         </collection>
+     	<memo name="stabilityContradictionDetails">
+			<displayName>Details</displayName>
+		</memo>
+        
     </attributes>
 </document>

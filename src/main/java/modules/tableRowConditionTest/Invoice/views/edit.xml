@@ -34,14 +34,25 @@
 				</properties>
 	        </boundColumn>
 	        <boundColumn binding="delivery">
-	        	<properties>
+	        	<!-- <properties>
 	        		<c:property key="collectionBinding">items</c:property>
 	        		<c:property key="rerender">change</c:property>
-	        	</properties>
+	        	</properties> -->
 	        </boundColumn>
 	    </dataGrid>
     </vbox>
-    <actions>
+	<form border="true"
+		borderTitle="Please provide more details on the contradictory evidence that was not addressed"
+		visible="canChange">
+		<column></column>
+		<row>
+			<item labelAlign="left">
+				<textArea binding="stabilityContradictionDetails" />
+			</item>
+		</row>
+	</form>
+      
+  <actions>
         <defaults/>
     </actions>
     <newParameters/>
