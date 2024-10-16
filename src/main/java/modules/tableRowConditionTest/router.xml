@@ -7,5 +7,17 @@
 		<route outcome="/test/invoice.xhtml">
 			<criteria webAction="e" module="tableRowConditionTest" document="Invoice"/>
 		</route>
+		<route outcome="/test/assessment.xhtml">
+			<criteria webAction="e" module="tableRowConditionTest" document="AssessmentList"/>
+		</route>
+	</uxui>
+	<uxui name="tablet">
+		<!-- use a custom route for the page holding the data grid so we can specify a custom.xhtml -->
+		<route outcome="/test/invoice.xhtml">
+			<criteria webAction="e" module="tableRowConditionTest" document="Invoice"/>
+		</route>
+		<route outcome="/test/assessment.xhtml">
+			<criteria webAction="e" module="tableRowConditionTest" document="AssessmentList"/>
+		</route>
 	</uxui>
 </router>
