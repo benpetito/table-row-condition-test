@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import modules.tableRowConditionTest.Invoice.InvoiceExtension;
 import modules.tableRowConditionTest.InvoiceItem.InvoiceItemExtension;
 import org.skyve.CORE;
 import org.skyve.domain.messages.DomainException;
@@ -19,7 +20,7 @@ import org.skyve.impl.domain.ChangeTrackingArrayList;
  */
 @XmlType
 @XmlRootElement
-public class Invoice extends AbstractPersistentBean {
+public abstract class Invoice extends AbstractPersistentBean {
 	/**
 	 * For Serialization
 	 * @hidden
@@ -41,6 +42,9 @@ public class Invoice extends AbstractPersistentBean {
 	/** @hidden */
 	public static final String itemsPropertyName = "items";
 
+	/** @hidden */
+	public static final String additionalDetailsPropertyName = "additionalDetails";
+
 	/**
 	 * Invoice No.
 	 **/
@@ -56,6 +60,11 @@ public class Invoice extends AbstractPersistentBean {
 	 **/
 	private List<InvoiceItemExtension> items = new ChangeTrackingArrayList<>("items", this);
 
+	/**
+	 * Additional Details
+	 **/
+	private String additionalDetails;
+
 	@Override
 	@XmlTransient
 	public String getBizModule() {
@@ -68,7 +77,7 @@ public class Invoice extends AbstractPersistentBean {
 		return Invoice.DOCUMENT_NAME;
 	}
 
-	public static Invoice newInstance() {
+	public static InvoiceExtension newInstance() {
 		try {
 			return CORE.getUser().getCustomer().getModule(MODULE_NAME).getDocument(CORE.getUser().getCustomer(), DOCUMENT_NAME).newInstance(CORE.getUser());
 		}
@@ -167,7 +176,7 @@ public class Invoice extends AbstractPersistentBean {
 	public boolean addItemsElement(InvoiceItemExtension element) {
 		boolean result = items.add(element);
 		if (result) {
-			element.setParent(this);
+			element.setParent((InvoiceExtension) this);
 		}
 		return result;
 	}
@@ -179,7 +188,7 @@ public class Invoice extends AbstractPersistentBean {
 	 **/
 	public void addItemsElement(int index, InvoiceItemExtension element) {
 		items.add(index, element);
-		element.setParent(this);
+		element.setParent((InvoiceExtension) this);
 	}
 
 	/**
@@ -202,5 +211,42 @@ public class Invoice extends AbstractPersistentBean {
 		InvoiceItemExtension result = items.remove(index);
 		result.setParent(null);
 		return result;
+	}
+
+	/**
+	 * {@link #additionalDetails} accessor.
+	 * @return	The value.
+	 **/
+	public String getAdditionalDetails() {
+		return additionalDetails;
+	}
+
+	/**
+	 * {@link #additionalDetails} mutator.
+	 * @param additionalDetails	The new value.
+	 **/
+	@XmlElement
+	public void setAdditionalDetails(String additionalDetails) {
+		preset(additionalDetailsPropertyName, additionalDetails);
+		this.additionalDetails = additionalDetails;
+	}
+
+	/**
+	 * showDetails
+	 *
+	 * @return The condition
+	 */
+	@XmlTransient
+	public boolean isShowDetails() {
+		return (((InvoiceExtension)this).showDetails());
+	}
+
+	/**
+	 * {@link #isShowDetails} negation.
+	 *
+	 * @return The negated condition
+	 */
+	public boolean isNotShowDetails() {
+		return (! isShowDetails());
 	}
 }

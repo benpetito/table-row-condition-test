@@ -25,7 +25,7 @@
 	        	<properties>
 	   				<c:property key="rerender">change</c:property>
 					<c:property key="process">@this</c:property>
-					<c:property key="update">formInvoiceItems</c:property>
+					<c:property key="update">formInvoiceItems,formAdditionalDetails</c:property>
 	  			</properties>
 	        </boundColumn>
 	        <boundColumn binding="type">
@@ -41,16 +41,16 @@
 	        </boundColumn>
 	    </dataGrid>
     </vbox>
-	<form border="true"
-		borderTitle="Please provide more details on the contradictory evidence that was not addressed"
-		visible="canChange">
-		<column></column>
-		<row>
-			<item labelAlign="left">
-				<textArea binding="stabilityContradictionDetails" />
-			</item>
-		</row>
-	</form>
+    <vbox widgetId="formAdditionalDetails">
+		<form border="true" borderTitle="Please provide more details" visible="showDetails">
+			<column></column>
+			<row>
+				<item labelAlign="left">
+					<textArea binding="additionalDetails" />
+				</item>
+			</row>
+		</form>
+    </vbox>
       
   <actions>
         <defaults/>

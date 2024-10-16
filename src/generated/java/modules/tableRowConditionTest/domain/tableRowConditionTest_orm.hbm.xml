@@ -11,7 +11,7 @@
 	<typedef name="TimeOnly" class="org.skyve.impl.domain.types.TimeOnlyUserType" />
 	<typedef name="Timestamp" class="org.skyve.impl.domain.types.TimestampUserType" />
 	<typedef name="Enum" class="org.skyve.impl.domain.types.EnumUserType" />
-	<class name="modules.tableRowConditionTest.domain.Invoice" table="TAB_Invoice" entity-name="tableRowConditionTestInvoice">
+	<class name="modules.tableRowConditionTest.Invoice.InvoiceExtension" table="TAB_Invoice" entity-name="tableRowConditionTestInvoice">
 		<id name="bizId" length="36" />
 		<version name="bizVersion" unsaved-value="null" />
 		<property name="bizLock" type="OptimisticLock" length="271" not-null="true" />
@@ -26,6 +26,7 @@
 			<key column="parent_id" />
 			<one-to-many entity-name="tableRowConditionTestInvoiceItem" />
 		</bag>
+		<property name="additionalDetails" type="text" />
 		<filter name="tableRowConditionTestInvoiceNoneFilter" condition="1=0"/>
 		<filter name="tableRowConditionTestInvoiceCustomerFilter" condition="bizCustomer=:customerParam"/>
 		<filter name="tableRowConditionTestInvoiceDataGroupIdFilter" condition="bizDataGroupId=:dataGroupIdParam"/>

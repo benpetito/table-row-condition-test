@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import modules.tableRowConditionTest.Invoice.InvoiceExtension;
 import modules.tableRowConditionTest.InvoiceItem.InvoiceItemExtension;
 import org.skyve.CORE;
 import org.skyve.domain.Bean;
@@ -28,7 +29,7 @@ import org.skyve.util.Util;
  */
 @XmlType
 @XmlRootElement
-public abstract class InvoiceItem extends AbstractPersistentBean implements ChildBean<Invoice> {
+public abstract class InvoiceItem extends AbstractPersistentBean implements ChildBean<InvoiceExtension> {
 	/**
 	 * For Serialization
 	 * @hidden
@@ -158,7 +159,7 @@ public abstract class InvoiceItem extends AbstractPersistentBean implements Chil
 	 **/
 	private Type type;
 
-	private Invoice parent;
+	private InvoiceExtension parent;
 
 	private Integer bizOrdinal;
 
@@ -314,13 +315,13 @@ public abstract class InvoiceItem extends AbstractPersistentBean implements Chil
 	}
 
 	@Override
-	public Invoice getParent() {
+	public InvoiceExtension getParent() {
 		return parent;
 	}
 
 	@Override
 	@XmlElement
-	public void setParent(Invoice parent) {
+	public void setParent(InvoiceExtension parent) {
 		if (this.parent != parent) {
 			preset(ChildBean.PARENT_NAME, parent);
 			this.parent = parent;

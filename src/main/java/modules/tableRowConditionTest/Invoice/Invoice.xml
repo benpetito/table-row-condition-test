@@ -18,9 +18,13 @@
             <minCardinality>0</minCardinality>
             <ordering/>
         </collection>
-     	<memo name="stabilityContradictionDetails">
-			<displayName>Details</displayName>
+     	<memo name="additionalDetails">
+			<displayName>Additional Details</displayName>
 		</memo>
-        
     </attributes>
+    <conditions>
+    	<condition name="showDetails">
+    		<expression><![CDATA[((InvoiceExtension)this).showDetails()]]></expression>
+    	</condition>
+    </conditions>
 </document>
