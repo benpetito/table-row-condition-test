@@ -17,7 +17,8 @@ import org.skyve.impl.metadata.view.widget.bound.input.TextField;
 import org.skyve.impl.metadata.view.widget.bound.tabular.AbstractDataWidget;
 import org.skyve.impl.metadata.view.widget.bound.tabular.DataGridBoundColumn;
 import org.skyve.impl.web.faces.pipeline.component.ResponsiveComponentBuilder;
-import org.skyve.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Custom component builder to allow data grid to specify individual rows to be enabled
@@ -31,6 +32,8 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 	public static final String EDITABLE_CONDITION_KEY = "editableCondition";
 	public static final String VISIBLE_CONDITION_KEY = "visibleCondition";
 	public static final String RERENDER_KEY = "rerender";
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DataGridComponentBuilder.class);
 
 	private String boundColumnEditableCondition,
 			boundColumnVisibleCondition,
@@ -51,16 +54,22 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 		final String collectionBindingName = column.getProperties().get(COLLECTION_BINDING_KEY);
 		if (StringUtils.isNotBlank(collectionBindingName)) {
 			collectionBinding = collectionBindingName;
+		} else {
+			collectionBinding = null;
 		}
 
 		final String editableCondition = column.getProperties().get(EDITABLE_CONDITION_KEY);
 		if (StringUtils.isNotBlank(editableCondition)) {
 			boundColumnEditableCondition = editableCondition;
+		} else {
+			boundColumnEditableCondition = null;
 		}
 
 		final String visibleCondition = column.getProperties().get(VISIBLE_CONDITION_KEY);
 		if (StringUtils.isNotBlank(visibleCondition)) {
 			boundColumnVisibleCondition = visibleCondition;
+		} else {
+			boundColumnVisibleCondition = null;
 		}
 
 		if (column.getProperties().containsKey(RERENDER_KEY)) {
@@ -133,7 +142,8 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 		return eventSource;
 	}
 
-	private void addBoundColumnRerenderEvent(UIComponentBase componentBase, String collectionBinding, String listVar, String binding) {
+	private void addBoundColumnRerenderEvent(UIComponentBase componentBase, String collectionBinding1, String listVar,
+			String binding) {
         final RerenderEventAction rerenderEventAction = new RerenderEventAction();
 		rerenderEventAction.setClientValidation(Boolean.TRUE);
 
@@ -145,8 +155,8 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
             rerenderEventAction.getProperties().put(UPDATE_KEY, boundColumnUpdate);
             boundColumnUpdate = null;
         }
-		Util.LOGGER.info("addAjaxBehaviour collectionBinding:" + collectionBinding);
-        addAjaxBehavior(componentBase, rerenderEventName, collectionBinding, listVar, binding,
+		LOGGER.debug("addAjaxBehaviour collectionBinding: {}", collectionBinding1);
+		addAjaxBehavior(componentBase, rerenderEventName, collectionBinding1, listVar, binding,
                 Collections.singletonList(rerenderEventAction));
     }
 }
