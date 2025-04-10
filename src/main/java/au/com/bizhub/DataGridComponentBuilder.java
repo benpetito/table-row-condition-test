@@ -88,6 +88,22 @@ public class DataGridComponentBuilder extends ResponsiveComponentBuilder {
 				title, required);
 		final UIComponent checkBoxField = eventSource.getComponent();
 
+		if (StringUtils.isNotBlank(boundColumnEditableCondition)) {
+			LOGGER.debug("Adding editable condition to combo: " + checkBox.getBinding());
+			final ValueExpression expression = ef.createValueExpression(elc,
+					String.format("#{%s['%s'] eq false}", dataWidgetVar, boundColumnEditableCondition), Boolean.class);
+			checkBoxField.setValueExpression("disabled", expression);
+			boundColumnEditableCondition = null;
+		}
+
+		if (StringUtils.isNotBlank(boundColumnVisibleCondition)) {
+			LOGGER.debug("Adding visible condition to combo: " + checkBox.getBinding());
+			final ValueExpression expression = ef.createValueExpression(elc,
+					String.format("#{%s['%s']}", dataWidgetVar, boundColumnVisibleCondition), Boolean.class);
+			checkBoxField.setValueExpression("rendered", expression);
+			boundColumnVisibleCondition = null;
+		}
+
 		if (StringUtils.isNotBlank(rerenderEventName)) {
 			addBoundColumnRerenderEvent((UIComponentBase) checkBoxField, collectionBinding, dataWidgetVar, checkBox.getBinding());
 			rerenderEventName = null;
