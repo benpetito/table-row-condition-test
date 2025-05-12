@@ -24,7 +24,7 @@ The customisations to this project required to make this work:
 
     ```xml
     <s:view
-        componentBuilderClass="au.com.bizhub.CustomComponentBiulderChain" />
+        componentBuilderClass="au.com.bizhub.CustomComponentBuilderChain" />
     ```
 
 4. The tableRowConditionTest module [router.xml](src/main/java/modules/tableRowConditionTest/router.xml) defines a route to the custom xhtml page when the Invoice document is being requested. This is what makes Skyve load the custom xhtml page instead of the standard edit page.
