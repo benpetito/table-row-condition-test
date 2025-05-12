@@ -6,11 +6,11 @@
     <parentDocument>Invoice</parentDocument>
     <bizKey expression="Invoice Item - {item}"/>
     <attributes>
-        <text required="true" name="item">
+        <text required="false" name="item">
             <displayName>Item</displayName>
             <length>200</length>
         </text>
-        <decimal2 required="true" name="amount">
+        <decimal2 required="false" name="amount">
             <displayName>Amount</displayName>
         </decimal2>
         <integer name="quantity">
@@ -27,6 +27,7 @@
                 <value code="Hours"/>
             </values>
         </enum>
+        
     </attributes>
     <conditions>
     	<condition name="canChange" usage="view">

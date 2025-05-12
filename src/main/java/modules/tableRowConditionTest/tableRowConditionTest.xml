@@ -3,8 +3,6 @@
     <homeRef>list</homeRef>
     <homeDocument>Invoice</homeDocument>
     <documents>
-        <document ref="Assessment"/>
-        <document ref="AssessmentList"/>
         <document ref="Invoice"/>
         <document ref="InvoiceItem"/>
     </documents>
@@ -12,8 +10,6 @@
         <role name="Viewer">
             <description><![CDATA[Enough privileges to view Table Row Condition Test documents.]]></description>
             <privileges>
-                <document name="Assessment" permission="_R__C"/>
-                <document name="AssessmentList" permission="_____"/>
                 <document name="Invoice" permission="_R__C"/>
                 <document name="InvoiceItem" permission="_R__C"/>
             </privileges>
@@ -22,8 +18,6 @@
         <role name="Maintainer">
             <description><![CDATA[Enough privileges to create and edit Table Row Condition Test documents.]]></description>
             <privileges>
-                <document name="Assessment" permission="CRUDC"/>
-                <document name="AssessmentList" permission="_____"/>
                 <document name="Invoice" permission="CRUDC"/>
                 <document name="InvoiceItem" permission="CRUDC"/>
             </privileges>
@@ -31,14 +25,6 @@
         </role>
     </roles>
     <menu>
-        <list document="Assessment" name="Assessments">
-            <role name="Maintainer"/>
-            <role name="Viewer"/>
-        </list>
-        <edit document="AssessmentList" name="Assessment List">
-        	<role name="Maintainer"/>
-            <role name="Viewer"/>
-        </edit>
         <list document="Invoice" name="Invoices">
             <role name="Maintainer"/>
             <role name="Viewer"/>
