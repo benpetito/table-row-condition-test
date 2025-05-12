@@ -28,5 +28,5 @@ The customisations to this project required to make this work:
     ```
 
 4. The tableRowConditionTest module [router.xml](src/main/java/modules/tableRowConditionTest/router.xml) defines a route to the custom xhtml page when the Invoice document is being requested. This is what makes Skyve load the custom xhtml page instead of the standard edit page.
-5. A [CustomComponentBuilderChain](src/main/java/au/com/bizhub/CustomComponentBiulderChain.java) tells Skyve which order to load the component builders in, which defines the order of rendering, and allows us to provide override behaviour for the `dataGrid` component.
+5. A [CustomComponentBuilderChain](src/main/java/au/com/bizhub/CustomComponentBuilderChain.java) tells Skyve which order to load the component builders in, which defines the order of rendering, and allows us to provide override behaviour for the `dataGrid` component.
 6. A [DataGridComponentBuilder](src/main/java/au/com/bizhub/DataGridComponentBuilder.java) class defines the additional properties we add to the dataGrid widget to allow it to listen for changes and implmenent the custom visbility within a table row.
